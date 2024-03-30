@@ -40,8 +40,8 @@ typedef struct{
 
     uint32_t* page_pointer[MAX_PAGE_COUNT];
     uint32_t allocation_table[MAX_PAGE_COUNT];
-
-
+    
+    node * first_node;
 }fs_tab;
 
 #define ROOT_SIZE sizeof(fs_tab);
@@ -51,9 +51,13 @@ node get_from_device(uint32_t *address);
 bool write_into_device(node n);
 fs_tab get_fs_tab();
 bool write_fs_tab(fs_tab root);
-uint32_t* fs_alloc(fs_tab root, int type);
+uint32_t* fs_alloc(fs_tab root, int type, char*name);
 bool fs_free(fs_tab root, uint32_t *adr);
 fs_tab init_fs(char*name, char*version, int size);
+node fs_navigate(fs_tab root,char*path);
+int get_subdir_num(char*name);
+bool nest_folder(fs_tab root,char*path, uint32_t* adr);
+bool fs_mkdir(fs_tab root, char*path, char*name);
 
 
 uint32_t * virtual_path;
