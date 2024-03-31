@@ -106,7 +106,6 @@ bool fs_free(fs_tab* root, uint32_t *adr){
 uint32_t* fs_alloc(fs_tab *root, int type, char*name){
     int i=0;
     node n;
-
     while(root->allocation_table[i] == 0xFF){
         i+=1;
     }
@@ -117,12 +116,10 @@ uint32_t* fs_alloc(fs_tab *root, int type, char*name){
     strcpy(n.name, name);
     n.type = type;
     n.next = NULL;
-
     for(int i=0;i<59;i++){
         n.content[i] = 0x00;
     }
     update_fs_tab(root);
-
     if(!write_into_device(n)){
         root->allocation_table[i] = 0x00;
         return NULL;
@@ -173,18 +170,26 @@ node fs_navigate(fs_tab* root,char*path){
         return n;    
     }
     node nz;
+    strcpy(nz.name, "NO_NODE_FOUND");
     return nz;
 }
 
 bool fs_mkdir(fs_tab* root,char*path,char*name){
-    node ng = fs_navigate(root,path);
+    uint32_t * new_page = NULL;
+    node ng = fs_navigate(root,path); 
+    if(strcmp(ng.name, "NO_NODE_FOUND") == 0){
+        return false;
+    }
     int content = 0;
     int no_occur = 0;
+    int occupated = 0;
     for(int i=0;i<59;i++){
         if(ng.content[i] != NULL){
             content+=1;
             node mv = get_from_device(ng.content[i]);
             if(strcmp(mv.name, name) != 0) no_occur+=1; 
+        }else{
+            occupated+=1;
         }
     }
     if(content == no_occur){
@@ -202,8 +207,83 @@ bool fs_mkdir(fs_tab* root,char*path,char*name){
     return false;
 }
 
+
+bool fs_rmdir(fs_tab*root, char*path, char*name){
+    node new_page;
+    int occupated = 0;
+    node ng = fs_navigate(root,path);
+    bool end = false;
+    if(strcmp(ng.name, "NO_NODE_FOUND") == 0){
+        return false;
+    }
+    if(occupated == 58 && ng.next != NULL){
+        while(end == false){
+            for(int i = 0;i<59 && !end;i++){
+                if(ng.content[i] != NULL){
+                    node mv = get_from_device(ng.content[i]);
+                    if(strcmp(mv.name,name) == 0){
+                        fs_free(root,mv.adr);
+                        ng.content[i] = NULL;
+                        end = true;
+                    }
+                }
+            }
+            if(end == false){
+                if(ng.next != NULL){ 
+                    ng = get_from_device(ng.next);
+                }else{
+                    end = true;
+                }
+
+            }
+
+        }
+        
+    }
+
+    if(!write_into_device(ng)){
+        return false;
+    }
+    return true;
+}
+
+bool fs_mv(fs_tab*root,char*path,char*name, char*dest){
+    uint32_t *adr = NULL;
+    node ng = fs_navigate(root,path);
+    if(strcmp(ng.name, "NO_NODE_FOUND") == 0){
+        return false;
+    }
+    bool end = false;
+    for(int i=0;i<59 && !end;i++){
+        if(ng.content[i] != NULL){
+            node mv = get_from_device(ng.content[i]);
+            if(strcmp(mv.name,name) == 0){
+                adr = mv.adr;
+                ng.content[i] = NULL;
+                end = true;
+            }
+        }
+    }
+    write_into_device(ng);
+    ng = fs_navigate(root,dest);
+    if(strcmp(ng.name, "NO_NODE_FOUND") == 0){
+        return false;
+    }
+    end = false;
+    for(int i = 0; i<59 && !end; i++){
+        if(ng.content[i] == NULL){
+            ng.content[i] = adr;
+        }
+    }
+    if(write_into_device(ng)) return true;
+    return false;
+}
+
 bool nest_folder(fs_tab* root, char*path, uint32_t *adr){
     node n = fs_navigate(root,path);
+    if(strcmp(n.name, "NO_NODE_FOUND") == 0){
+        return false;
+    }
     int i = 0;
     while(n.content[i] != NULL){
         i+=1;
@@ -217,12 +297,25 @@ bool nest_folder(fs_tab* root, char*path, uint32_t *adr){
 
 void fs_get_dir_content(fs_tab*root, char*path){
     node n = fs_navigate(root,path);
+    if(strcmp(n.name, "NO_NODE_FOUND") == 0){
+        return;
+    }
     for(int i=0;i<59;i++){
         if(n.content[i] != NULL){
             node lg = get_from_device(n.content[i]);
             printf("- %s - %d\n", lg.name, lg.type);
         }
     }
+}
+
+void fs_get_info(fs_tab*root){
+    printf("===============================\n\n");
+    printf("Partition name: %s\n", root->name);
+    printf("fs version: %s\n", root->version);
+    printf("Partition size ( in byte ): %d\n", root->fs_table_byte_space);
+    printf("\n-> free space: %d\n", root->free_space*512);
+    printf("-> used space: %d\n\n", root->used_space*512);
+    printf("===============================\n");
 }
 
 fs_tab init_fs(char*name, char*version, int size){

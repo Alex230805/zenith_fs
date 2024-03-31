@@ -64,8 +64,13 @@ node fs_navigate(fs_tab *root,char*path);
 int get_subdir_num(char*name);
 bool nest_folder(fs_tab *root,char*path, uint32_t* adr);
 bool fs_mkdir(fs_tab *root, char*path, char*name);
+bool fs_rmdir(fs_tab *root, char*path, char*name);
+bool fs_mv(fs_tab *root, char*path,char*name, char*dest);
+
 bool update_fs_tab(fs_tab*root);
 void fs_get_dir_content(fs_tab*root, char*path);
+void fs_get_info(fs_tab*root);
+
 
 uint32_t * virtual_path;
 int __DEVICE__;

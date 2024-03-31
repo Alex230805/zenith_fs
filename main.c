@@ -8,7 +8,7 @@
 int main(void){
     enum device_type tp = VIRTUAL_DISK;
     fs_set_device(tp);
-    fs_tab root = init_fs("generic_g", "1.0", MEDIUM_SIZE);
+    fs_tab root = init_fs("sddc_virtual", "1.0", MEDIUM_SIZE);
 
     fs_mkdir(&root,"/", "test_dir");
     fs_mkdir(&root,"/", "test_dir2");
@@ -26,8 +26,10 @@ int main(void){
     fs_get_dir_content(&root,"/test_dir3/");
     printf("content of /test_dir/:\n");
     fs_get_dir_content(&root,"/test_dir");
-
-    
+    printf("content of /test_dir/:\n");
+    fs_rmdir(&root, "/test_dir/", "ggf");
+    fs_get_dir_content(&root,"/test_dir");
+    fs_get_info(&root);    
     printf("Hello, World\n");
     free(virtual_path);
     return 0;
