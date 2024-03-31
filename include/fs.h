@@ -19,11 +19,17 @@
 #define DIR_MASK 0x10
 
 
+#define __VIRTUAL_DISK__ 0x01
+#define __x86_64b_OS__ 0x02
+#define __ARDUINO__ 0x03
+
+enum device_type{VIRTUAL_DISK,x86_64b_OS, ARDUINO};
+
 typedef struct{
     uint32_t *adr;
     char name[16];
     uint8_t type;
-    uint32_t * content[296];
+    uint32_t * content[59];
     uint32_t * next;
 }node;
 
@@ -46,21 +52,24 @@ typedef struct{
 
 #define ROOT_SIZE sizeof(fs_tab);
 
-
+void fs_set_device(int type);
 node get_from_device(uint32_t *address);
 bool write_into_device(node n);
 fs_tab get_fs_tab();
-bool write_fs_tab(fs_tab root);
-uint32_t* fs_alloc(fs_tab root, int type, char*name);
-bool fs_free(fs_tab root, uint32_t *adr);
+bool write_fs_tab(fs_tab *root);
+uint32_t* fs_alloc(fs_tab *root, int type, char*name);
+bool fs_free(fs_tab* root, uint32_t *adr);
 fs_tab init_fs(char*name, char*version, int size);
-node fs_navigate(fs_tab root,char*path);
+node fs_navigate(fs_tab *root,char*path);
 int get_subdir_num(char*name);
-bool nest_folder(fs_tab root,char*path, uint32_t* adr);
-bool fs_mkdir(fs_tab root, char*path, char*name);
-
+bool nest_folder(fs_tab *root,char*path, uint32_t* adr);
+bool fs_mkdir(fs_tab *root, char*path, char*name);
+bool update_fs_tab(fs_tab*root);
+void fs_get_dir_content(fs_tab*root, char*path);
 
 uint32_t * virtual_path;
+int __DEVICE__;
+
 
 #ifdef FS_IMPLEMENTATION
 #define FS_C
