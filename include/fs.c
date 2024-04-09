@@ -1,4 +1,4 @@
-#define FS_C
+#define ZENITH_C
 
 #include "./fs.h" 
 
@@ -20,16 +20,30 @@ void fs_set_device(int type){
 
 node get_from_device(uint32_t*address){
     node n;
-    switch(__DEVICE__){
-        case __VIRTUAL_DISK__:
-            memcpy(&n, address, sizeof(node));
-            break;
-        case __x86_64b_OS__:
-            break;
-        case __ARDUINO__:
-            break;
+    if(!fs_is_alloc(address)){
+        strcpy(n.name, "NO_NODE_FOUND");
+    }else{
+        switch(__DEVICE__){
+            case __VIRTUAL_DISK__:
+                memcpy(&n, address, sizeof(node));
+                break;
+            case __x86_64b_OS__:
+                break;
+            case __ARDUINO__:
+                break;
+        }
     }
+    
     return n;
+}
+
+bool fs_is_alloc(uint32_t*address){
+    fs_tab root = get_fs_tab();
+    bool found = false;
+    for(int i=0;i<MAX_PAGE_COUNT;i++){
+        if(root.page_pointer[i] == address) found = true;
+    }
+    return found;
 }
 
 fs_tab get_fs_tab(){
@@ -174,37 +188,82 @@ node fs_navigate(fs_tab* root,char*path){
     return nz;
 }
 
+bool fs_is_present(node ng, char*name){
+    int no_occur = 0;
+    int content = 0;
+    for(int i=0;i<59;i++){
+        if(ng.content[i] != NULL){
+            content+=1;
+            node mv = get_from_device(ng.content[i]);
+            if(strcmp(mv.name, name) != 0) no_occur+=1; 
+        }
+    }
+    if(content == no_occur){
+        return false;
+    }
+    return true;
+}
+
+int fs_is_present_pos(node ng, char*name){
+    int pos = 0;
+    for(int i=0;i<59;i++){
+        if(ng.content[i] != NULL){
+            node mv = get_from_device(ng.content[i]);
+            if(strcmp(mv.name, name) == 0){
+              pos = i;  
+            } 
+        }
+    } 
+    return pos;    
+}
+
+bool fs_have_subdir(uint32_t*address){
+    node ng = get_from_device(address);
+    if(strcmp(ng.name,"NO_NODE_FOUND") == 0){
+        return true;
+    }
+    while(1){
+        for(int i=0;i<59;i++){
+            if(ng.content[i] != NULL){
+                return true;
+            }        
+        }
+        if(ng.next != NULL){
+            ng = get_from_device(ng.next);
+        }else{
+            return false;
+        }
+    }
+    return true;
+}
+
 bool fs_mkdir(fs_tab* root,char*path,char*name){
     uint32_t * new_page = NULL;
     node ng = fs_navigate(root,path); 
     if(strcmp(ng.name, "NO_NODE_FOUND") == 0){
         return false;
     }
-    int content = 0;
-    int no_occur = 0;
-    int occupated = 0;
-    for(int i=0;i<59;i++){
-        if(ng.content[i] != NULL){
-            content+=1;
-            node mv = get_from_device(ng.content[i]);
-            if(strcmp(mv.name, name) != 0) no_occur+=1; 
-        }else{
-            occupated+=1;
+    while(1){
+        if(!fs_is_present(ng,name)){
+            uint32_t * n = fs_alloc(root,DIR_MASK,name);
+            int i = 0;
+            while(ng.content[i] != NULL){
+                i+=1;
+            }
+            if(i < 59){
+                ng.content[i] = n;
+                if(!write_into_device(ng)) return false;
+                return true;
+            }
         }
+        if(ng.next == NULL){
+            uint32_t *n = fs_alloc(root,DIR_MASK,"__CONTIGUOUS__");
+            ng.next = n;
+            if(!write_into_device(ng)) return false;
+        }
+        ng = get_from_device(ng.next);
     }
-    if(content == no_occur){
-        uint32_t * n = fs_alloc(root,DIR_MASK,name);
-        int i = 0;
-        while(ng.content[i] != NULL){
-            i+=1;
-        }
-        ng.content[i] = n;
-        if(!write_into_device(ng)){
-            return false;
-        }
-        return true;
-    }
-    return false;
+   return false;
 }
 
 
@@ -216,54 +275,38 @@ bool fs_rmdir(fs_tab*root, char*path, char*name){
     if(strcmp(ng.name, "NO_NODE_FOUND") == 0){
         return false;
     }
-    if(occupated == 58 && ng.next != NULL){
-        while(end == false){
-            for(int i = 0;i<59 && !end;i++){
-                if(ng.content[i] != NULL){
-                    node mv = get_from_device(ng.content[i]);
-                    if(strcmp(mv.name,name) == 0){
-                        fs_free(root,mv.adr);
-                        ng.content[i] = NULL;
-                        end = true;
-                    }
-                }
+    while(1){
+        if(fs_is_present(ng,name)){
+            int pos = fs_is_present_pos(ng, name);
+            if(!fs_have_subdir(ng.content[pos])){
+                fs_free(root,ng.content[pos]);
+                ng.content[pos] = NULL;
+                if(!write_into_device(ng)) return false;
+                return true;
             }
-            if(end == false){
-                if(ng.next != NULL){ 
-                    ng = get_from_device(ng.next);
-                }else{
-                    end = true;
-                }
-
-            }
-
         }
-        
-    }
+        if(ng.next != NULL){
+            ng = get_from_device(ng.next);
+        }else{
+            return false;
+        }
 
-    if(!write_into_device(ng)){
-        return false;
     }
-    return true;
+    return false;
+
 }
 
 bool fs_mv(fs_tab*root,char*path,char*name, char*dest){
     uint32_t *adr = NULL;
+    bool end = false;
     node ng = fs_navigate(root,path);
     if(strcmp(ng.name, "NO_NODE_FOUND") == 0){
         return false;
     }
-    bool end = false;
-    for(int i=0;i<59 && !end;i++){
-        if(ng.content[i] != NULL){
-            node mv = get_from_device(ng.content[i]);
-            if(strcmp(mv.name,name) == 0){
-                adr = mv.adr;
-                ng.content[i] = NULL;
-                end = true;
-            }
-        }
-    }
+    int pos = fs_is_present_pos(ng,name);
+    node mv = get_from_device(ng.content[pos]);
+    adr = mv.adr;
+    ng.content[pos] = NULL;
     write_into_device(ng);
     ng = fs_navigate(root,dest);
     if(strcmp(ng.name, "NO_NODE_FOUND") == 0){
@@ -300,12 +343,21 @@ void fs_get_dir_content(fs_tab*root, char*path){
     if(strcmp(n.name, "NO_NODE_FOUND") == 0){
         return;
     }
-    for(int i=0;i<59;i++){
-        if(n.content[i] != NULL){
-            node lg = get_from_device(n.content[i]);
-            printf("- %s - %d\n", lg.name, lg.type);
+    printf("content of %s :\n", n.name);
+    while(1){
+        for(int i=0;i<59;i++){
+            if(n.content[i] != NULL){
+                node lg = get_from_device(n.content[i]);
+                printf("- %s - %d\n", lg.name, lg.type);
+            }
+        }
+        if(n.next != NULL){
+            n = get_from_device(n.next);
+        }else{
+            return;
         }
     }
+    
 }
 
 void fs_get_info(fs_tab*root){

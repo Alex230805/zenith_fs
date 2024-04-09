@@ -66,20 +66,19 @@ bool nest_folder(fs_tab *root,char*path, uint32_t* adr);
 bool fs_mkdir(fs_tab *root, char*path, char*name);
 bool fs_rmdir(fs_tab *root, char*path, char*name);
 bool fs_mv(fs_tab *root, char*path,char*name, char*dest);
-
+bool fs_is_present(node ng , char* name);
+int fs_is_present_pos(node ng, char*name);
 bool update_fs_tab(fs_tab*root);
 void fs_get_dir_content(fs_tab*root, char*path);
 void fs_get_info(fs_tab*root);
-
+bool fs_is_alloc(uint32_t*address);
+bool fs_have_subdir(uint32_t*address);
 
 uint32_t * virtual_path;
 int __DEVICE__;
 
-
-#ifdef FS_IMPLEMENTATION
-#define FS_C
+#ifndef ZENITH_C
+#define ZENITH_C
 #endif
-
-
 
 #endif

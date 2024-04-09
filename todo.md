@@ -15,17 +15,21 @@ description: todo list for my custom fs ( zenith fs )
 
 - add a function to nest a node in a specific directory ( if exist ) <strong>DONE</strong>
 
+- optimize the mkdir an rm process in the navigation section in a single page dir and in a multiple page one, now teorically you can store more than 59 dir or file per folder <strong>DONE</strong>
+
+- function to make the fs code less verbose
+
 ## advanced method ( or function where the use of the basic method is necessary )
 
 - function to get a full size file from the disk
 
 - function to create a directory <strong>DONE</strong>
 
-- function to move a directory
+- function to move a directory <strong>DONE</strong> 
 
 - function to copy a directory 
 
-- function to remove a directory
+- function to remove a directory <strong>DONE</strong> 
 
 - function to create a file
 
