@@ -74,8 +74,38 @@ void fs_get_info(fs_tab*root);
 bool fs_is_alloc(uint32_t*address);
 bool fs_have_subdir(uint32_t*address);
 
+
+typedef struct {
+    void (*setDevice)(int);
+    node (*getFromDevice)(uint32_t*);
+    bool (*writeIntoDevice)(node);
+    fs_tab (*getFsTab)(void);
+    bool (*writeFsTab)(fs_tab*);
+    fs_tab (*initFs)(char*, char*, int);
+    bool (*mkDir)(fs_tab*,char*, char*);
+    bool (*rmDir)(fs_tab*, char*, char*);
+    bool (*move)(fs_tab*, char*, char*, char*);
+    void (*ls)(fs_tab*, char*);
+    void (*getInfo)(fs_tab*);
+}Zenith_cls;
+
+static Zenith_cls Zth = {
+    fs_set_device,
+    get_from_device,
+    write_into_device,
+    get_fs_tab,
+    write_fs_tab,
+    init_fs,
+    fs_mkdir,
+    fs_rmdir,
+    fs_mv,
+    fs_get_dir_content,
+    fs_get_info
+};
+
 uint32_t * virtual_path;
 int __DEVICE__;
+
 
 #ifndef ZENITH_C
 #define ZENITH_C
