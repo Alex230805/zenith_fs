@@ -1,13 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 #include "include/fs.h"
 
 int main(void){
-    enum device_type tp = VIRTUAL_DISK;
-
-    Zth.setDevice(tp);
     fs_tab root = Zth.initFs("dev/sdc_virtual", "Zenith 1.0", MEDIUM_SIZE);
     Zth.mkDir(&root,"/", "usr");
     Zth.mkDir(&root,"/", "share");
