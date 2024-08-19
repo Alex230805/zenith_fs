@@ -51,20 +51,45 @@ extern int get_subdir_num(char*name){
 
 extern bool nest_folder(fs_tab* root, char*path, uint32_t *adr){
     node n = fs_navigate(root,path);
+    bool end = false;
+    uint32_t* possible_next = NULL;
     if(strcmp(n.name, "NO_NODE_FOUND") == 0){
         return false;
     }
-    int i = 0;
-    while(n.content[i] != NULL){
-        i+=1;
+    
+
+    while(fs_is_empty(&n)){
+       if(n.next != NULL){
+            memcpy(&n, n.next, sizeof(node));
+        }else{
+            possible_next = fs_alloc(root, DIR_MASK, "__CONTIGUOUS__");
+            n.next = possible_next;
+            write_into_device(n);
+            memcpy(&n, n.next, sizeof(node));
+        } 
     }
-    n.content[i] = adr;
+    for(int i=0;i<59 && !end;i++){
+        if(n.content[i] == NULL){
+            n.content[i] = adr;
+            end = true;
+        }
+    }
+
     if(!write_into_device(n)){
         return false;
     }
     return true;
 }
 
+extern bool fs_is_empty(node *n){
+    bool end = false;
+    for(int i=0;i<59 && !end;i++){
+        if(n->content[i] == NULL){
+            end = true;
+        }
+    }
+    return end;
+}
 
 extern bool fs_mkdir(fs_tab* root,char*path,char*name){
     uint32_t * new_page = NULL;

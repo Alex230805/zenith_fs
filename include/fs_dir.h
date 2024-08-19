@@ -7,6 +7,7 @@
 extern node fs_navigate(fs_tab *root,char*path);
 extern int get_subdir_num(char*name);
 extern bool nest_folder(fs_tab *root,char*path, uint32_t* adr);
+extern bool fs_is_empty(node *n);
 extern bool fs_mkdir(fs_tab *root, char*path, char*name);
 extern bool fs_rmdir(fs_tab *root, char*path, char*name);
 extern bool fs_mv(fs_tab *root, char*path,char*name, char*dest);
