@@ -1,6 +1,14 @@
 #ifndef FS_DIR_H
 #define FS_DIR_H
 
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include "./fs_table.h"
 
 

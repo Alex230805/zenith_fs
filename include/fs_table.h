@@ -6,7 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
-
+#include <stdint.h>
 
 /* device selection 
 *   Defien device target for compilation, define only one target
@@ -75,7 +75,7 @@ extern bool fs_free(fs_tab* root, uint32_t *adr);
 extern bool update_fs_tab(fs_tab*root);
 extern bool fs_is_alloc(uint32_t*address);
 
-uint32_t * virtual_path;
+static uint32_t * virtual_path;
 
 #ifndef FS_TABLE_IMPLEMENTATION
 #define FS_TABLE_IMPLEMENTATION
