@@ -8,11 +8,96 @@
 #include <stdint.h>
 #include <ctype.h>
 
-/* zenith library */
 
-#include "./zth_dir.h"
-#include "./zth_file.h"
+/*  virtual drive precompiler directive to enable a virtual drive 
+    enviorment to test the filesystem in the local ram.
+    to enable ONLY the dev enviorment you need to uncomment the 
+    definition down here
+*/
 
+//#define VIRTUAL_DRIVE
+
+
+#define VIRTUAL_DRIVE
+
+/* fs tab precompiler costant */
+
+#define SIZE 16777216
+
+/* size precompiler costant that shoud be defined to specify the partition size */
+
+#ifndef SIZE
+
+#define SIZE 65536 /* default partition size ( 64kb ) */
+
+#endif
+
+#define MAX_FILESYSTEM_SIZE 16777216 /* max size adressable by the filesystem ( in byte ) */
+
+
+#define NAME_LENGTH 8
+#define NODE_COUNT ( SIZE / 255 )    /* node number */
+#define PERM_MASK_FILE 0xc0
+#define PERM_MASK_DIR 0x80
+#define BOOL_SIZE (sizeof(bool))
+#define UINT8_T_SIZE (sizeof(uint8_t))
+#define CHAR_SIZE (sizeof(char))
+
+#define CONTENT_SIZE (0xff - BOOL_SIZE - UINT8_T_SIZE*8 - CHAR_SIZE*NAME_LENGTH)
+
+#define W_PERM  (0b00000011 | PERM_MASK)
+#define R_PERM  (0b00001100 | PERM_MASK)
+#define E_PERM  (0b00110000 | PERM_MASK)
+
+#define TYPES_MASK 0xf
+#define FILE_TYPE ( TYPES_MASK | 0x0d )
+#define DIR_TYPE ( TYPES_MASK | 0x0e)
+
+typedef struct{
+    /* file name, max 8 chars */
+    char name[NAME_LENGTH];
+    /* type of node, if it's a folder or a directory */
+    uint8_t type;
+    /* file permission, in many cases would be usefull */
+    uint8_t perm;
+    /* the actual content of the file */
+    uint8_t content[CONTENT_SIZE];
+    /* variable to check if the file is extended to another */
+    bool extended;
+    /* address of the extension address */
+    uint8_t extended_adr_lb;
+    uint8_t extended_adr_hb;
+    uint8_t extended_adr_xlb;
+    /* current node adr */
+
+    uint8_t adr_lb;
+    uint8_t adr_hb;
+    uint8_t adr_xlb;
+
+}zenith_general_node;
+
+
+typedef struct{
+    /* name for the partition */
+    char name[NAME_LENGTH];
+    /* partition size, max 16mb */
+    int partition_size; 
+    /* allocated node variable */
+    int free_space;
+    int free_page;
+    bool allocated_page[NODE_COUNT];
+    /* address for each node */
+    uint8_t page_address[NODE_COUNT*3];
+
+
+}zenith_fstab;
+
+/* size of the standard filesystem node and size of the zenith filesystem table */
+
+#define ZENITH_NODE_SIZE (sizeof(zenith_general_node))
+#define ZENITH_FSTAB_SIZE (sizeof(zenith_fstab))
+
+static uint8_t* virtual_drive = NULL;
 
 #ifndef ZENITH_IMPLEMENTATION
 #define ZENITH_IMPLEMENTATION
