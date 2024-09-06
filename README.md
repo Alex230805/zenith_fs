@@ -7,7 +7,7 @@
 ### a light weigth filesystem created for 8bit micro computer and similar system that require some sort of file manager, but without any limitation
 
 
-The main goal is to bring to old system a modern like piece of software that can simplify the file archiviation with a standard, simple and fast way to interact with an existing operating system and the bare metal under the hood.
+The main goal is to bring to old systems a modern like piece of software that can simplify the file archiviation with a standard, simple and fast way that interact with an existing operating system, and the raw metal under the hood.
 
 ## Requirement:
 
