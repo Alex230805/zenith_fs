@@ -22,3 +22,40 @@ The interaction layer ( as you can see from <a href="https://res.cloudinary.com/
 # <h1>Main Structure of Zenith</h1>
 
 <img src="https://res.cloudinary.com/djjwizrmr/image/upload/v1725624599/zenith_fs/zenith_fs_main_structure.jpg" id="#image_1">
+
+
+# Types of supported drive: it's may depend ...
+
+
+Due to the nature of the filesystem write a standard way to write and read things from drive is nearly impossible. 
+The nature of the Operating System where Zenith were be compiled is unknown 
+and, beside a standard way, for other types of support like the serial ones
+or other things is necessary to write it dow from scratch.
+
+Well in reality in any complete Operating System with the goal of storing and archiving things, a driver for each single external support is obviously present. So the structure of the I/O layer of Zenith is dependent by those driver. 
+
+With a selection is possible to change the method used for write or read, and
+it's a simple switch case. 
+
+The default implementation is a simple parallel connection with the address bus and it's possible to add newest ones by add a new case in the switch and 
+simply integrate the writing and readign using standards kernel's endpoint.
+
+
+<strong>Uncomment the necessary pre-compiler constant to enable the default support or to compile in Developer mode.
+
+Those are located on top of the zenith.h header file  
+</strong>
+
+### for more information check out the zth_dev_in.h header library
+
+
+
+<style>
+
+img{
+    margin-top:50px;
+    margin-bottom:50px;
+    border-radius:5px;
+}
+
+</style>

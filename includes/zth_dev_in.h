@@ -18,6 +18,35 @@
     flag for the virtual drive is not enabled
  */
 
+
+ /*  virtual drive precompiler directive to enable a virtual drive 
+    enviorment to test the filesystem in the local ram.
+    to enable ONLY the dev enviorment you need to uncomment the 
+    definition down here
+*/
+
+
+/*  Other support will require a separate implementation due to
+    the nature of the filesystem and the unknown integration with the OS.
+    So by default the first implementation would be a direct connection with
+    the support, with some sort of access to the address and the data port of the
+    drive. An example of the perfect use case for that is if in the system is 
+    present a CF Card support. A CF Card require a paralle interaction that can be
+    provided by the system by simply dedicate a piece of address space of the cpu 
+    to allocate the address port ( in that case 24 for a max o 16mb ) and the data 
+    port ( 8bit ).
+
+    To implement other support is simple, you just need the driver from the system
+    provided by the kernel and code a custom implementation similar to the default one.
+
+    With that system is possible to integrate a SPI or an I2S support, or even other serial
+    protocols by simply adding the dedicated driver.
+    For a better usage it's possible to exclude even the default implementation if the
+    specs from your system are differents, for general purpose and to cover the simplest 
+    type of support for most parallel devices ( like ROMs or CF cards ) are present by default.
+
+ */
+
 #ifndef VIRTUAL_DRIVE
 
 #define DATA_PORT 0xeaea /* some address */
@@ -35,21 +64,21 @@
     the filesystem changes and new node into the phisical 
     drive.
     It accept an allocated node in ram and write it down into the
-    local drive.
+    local drive and the type of driver.
     It return a boolean status variable to identify what's appened.
 
  */
 
-extern void zenith_push(zenith_general_node *node);
+extern void zenith_push(zenith_general_node *node, uint8_t support_type);
 
 /*  zenith_pop() is used as a standard layer to get things from
     the filesystem, it allocate automatically new static node in 
     RAM ready to be read or write, and retur the RAM address of the node. 
     It accept an address directly related to the local drive and get the node
-    referred to it.
+    referred to it and the type of driver.
 */
 
-extern zenith_general_node* zenith_pop(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb);
+extern zenith_general_node* zenith_pop(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb,uint8_t support_type);
 
 
 

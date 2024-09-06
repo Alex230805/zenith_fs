@@ -9,16 +9,16 @@
 #include <ctype.h>
 
 
-/*  virtual drive precompiler directive to enable a virtual drive 
-    enviorment to test the filesystem in the local ram.
-    to enable ONLY the dev enviorment you need to uncomment the 
-    definition down here
-*/
+/* types of support and drive */
 
-//#define VIRTUAL_DRIVE
+//  #define VIRTUAL_DRIVE
+//  #define DIRECT_DRIVE_SUPPORT
 
 
-#define VIRTUAL_DRIVE
+#define DIRECT_DRIVE_SUPPORT
+
+/* ================================================= */
+
 
 /* fs tab precompiler costant */
 
@@ -45,6 +45,11 @@
 
 #define CONTENT_SIZE (0xff - BOOL_SIZE - UINT8_T_SIZE*8 - CHAR_SIZE*NAME_LENGTH)
 
+
+/* ================================================= */
+
+/* permission and node types */
+
 #define W_PERM  (0b00000011 | PERM_MASK)
 #define R_PERM  (0b00001100 | PERM_MASK)
 #define E_PERM  (0b00110000 | PERM_MASK)
@@ -52,6 +57,11 @@
 #define TYPES_MASK 0xf
 #define FILE_TYPE ( TYPES_MASK | 0x0d )
 #define DIR_TYPE ( TYPES_MASK | 0x0e)
+
+/* ================================================= */
+
+/* node and fs tab structure */
+
 
 typedef struct{
     /* file name, max 8 chars */
@@ -92,10 +102,15 @@ typedef struct{
 
 }zenith_fstab;
 
+/* ================================================= */
+
 /* size of the standard filesystem node and size of the zenith filesystem table */
 
 #define ZENITH_NODE_SIZE (sizeof(zenith_general_node))
 #define ZENITH_FSTAB_SIZE (sizeof(zenith_fstab))
+
+
+/* static variable and end-point */
 
 static uint8_t* virtual_drive = NULL;
 
