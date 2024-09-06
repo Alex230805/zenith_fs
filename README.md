@@ -16,7 +16,7 @@ To be fair the only requirement are a standard c library. It's necessary to have
 Any third party software that can provide those requirement will become fully capable to run Zenith FS.
 A goal of mine is to provide a standard interaction layer and use the simplest standard functions that a standard libray can provide ( malloc(), free(), etc... ) and the standard tipes ( char, int, uint8_t ). 
 
-The interaction layer ( as you can see from <a href="#image_1">Main structure</a> ) will function like a intermediary to excange operation from Zenith FS to the current OS. It's not allways a good idea to introduce a standard intermediary, expecially for speed goal, but this is a deal to mantain the highest compatibility possible, and to fast-fix Zenith for more strange and not-standard system. 
+The interaction layer ( as you can see from <a href="https://res.cloudinary.com/djjwizrmr/image/upload/v1725624599/zenith_fs/zenith_fs_main_structure.jpg">Main structure</a> ) will function like a intermediary to excange operation from Zenith FS to the current OS. It's not allways a good idea to introduce a standard intermediary, expecially for speed goal, but this is a deal to mantain the highest compatibility possible, and to fast-fix Zenith for more strange and not-standard system. 
 
 
 # <h1>Main Structure of Zenith</h1>
