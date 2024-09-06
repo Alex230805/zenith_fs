@@ -47,15 +47,3 @@ Those are located on top of the zenith.h header file
 </strong>
 
 ### for more information check out the zth_dev_in.h header library
-
-
-
-<style>
-
-img{
-    margin-top:50px;
-    margin-bottom:50px;
-    border-radius:5px;
-}
-
-</style>
