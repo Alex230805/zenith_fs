@@ -2,10 +2,9 @@
 
 
 echo "compiling... "
-gcc -c include/fs_table.c -o bin/fs_table.o
-gcc -c include/fs_file.c -o bin/fs_file.o
-gcc -c include/fs_dir.c -o bin/fs_dir.o
-gcc -c include/fs.c -o bin/fs.o
+gcc -c includes/zenith.c -o bin/zenith.o
+gcc -c includes/zth_dir.c -o bin/zth_dir.o
+gcc -c includes/zth_file.c -o bin/zth_file.o
 gcc -c main.c -o bin/main.o
-gcc ./bin/* -o testFs.out
+gcc ./bin/* -o a.out
 
