@@ -70,19 +70,31 @@ typedef struct{
     uint8_t type;
     /* file permission, in many cases would be usefull */
     uint8_t perm;
-    /* the actual content of the file */
-    uint8_t content[CONTENT_SIZE];
     /* variable to check if the file is extended to another */
     bool extended;
-    /* address of the extension address */
-    uint8_t extended_adr_lb;
-    uint8_t extended_adr_hb;
-    uint8_t extended_adr_xlb;
-    /* current node adr */
+    
+    #ifndef VIRTUAL_DRIVE
+        /* the actual content of the file */
+        uint8_t content[CONTENT_SIZE];
 
-    uint8_t adr_lb;
-    uint8_t adr_hb;
-    uint8_t adr_xlb;
+        /* address of the extension address */
+        uint8_t extended_adr_lb;
+        uint8_t extended_adr_hb;
+        uint8_t extended_adr_xlb;
+         /* current node adr */
+        uint8_t adr_lb;
+        uint8_t adr_hb;
+        uint8_t adr_xlb;
+    #endif
+
+    #ifdef VIRUTAL_DRIVE
+        /* DevMode: the actual content of the file */
+        void* content[CONTENT_SIZE];
+        /* DevMode: address of the extension address */
+        void* extended;
+        /* DevMode: current node adr */
+        void* current_address;
+    #endif
 
 }zenith_general_node;
 
@@ -97,8 +109,17 @@ typedef struct{
     int free_page;
     bool allocated_page[NODE_COUNT];
     /* address for each node */
+    #ifndef VIRTUAL_DRIVE
+
     uint8_t page_address[NODE_COUNT*3];
 
+    #endif
+
+    #ifdef VIRTUAL_DRIVE
+
+    void* page_address[NODE_COUNT];
+
+    #endif
 
 }zenith_fstab;
 
