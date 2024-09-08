@@ -3,12 +3,18 @@
 #include "./zth_dev_in.h"
 
 
-extern void zenith_push(zenith_general_node *node, uint8_t support_types){
+
+extern void zenith_push(uint8_t support_types){
     bool status;
-    uint8_t adr_lb = node->adr_lb;
-    uint8_t adr_hb = node->adr_hb;
-    uint8_t adr_xlb = node->adr_xlb;
+    #ifndef VIRTUAL_DRIVE
+
+    uint8_t adr_lb = cache_node->adr_lb;
+    uint8_t adr_hb = cache_node->adr_hb;
+    uint8_t adr_xlb = cache_node->adr_xlb;
+
+    #endif
     uint32_t mem = 0xeaeaea;
+
 
     
     #ifndef VIRTUAL_DRIVE
@@ -105,7 +111,7 @@ extern void zenith_push(zenith_general_node *node, uint8_t support_types){
                     memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
                     memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
 
-                    memcpy((void*)DATA_PORT, &node[i], UINT8_T_SIZE);
+                    memcpy((void*)DATA_PORT, &cache_node[i], UINT8_T_SIZE);
             #endif
                     break;
 
@@ -123,22 +129,28 @@ extern void zenith_push(zenith_general_node *node, uint8_t support_types){
 
     #ifdef VIRTUAL_DRIVE
     
-    void* address =  (void*)(adr_xlb<<16 | adr_hb<<8 | adr_lb);
-    memcpy(address,node,sizeof(zenith_general_node));
+    if(cache_node != NULL){
+        memcpy(cache_node->current_address,cache_node,ZENITH_NODE_SIZE);
+    }
 
     #endif
+
+
+    return;
 
 }
 
 
 
-extern zenith_general_node* zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t l_adr_xlb,uint8_t support_types){
-    zenith_general_node* node = NULL;
-    node = (zenith_general_node*)malloc(ZENITH_NODE_SIZE);
-    
+extern void zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t l_adr_xlb,uint8_t support_types){
+
+    #ifndef VIRTUAL_DRIVE
+
     uint8_t adr_lb = l_adr_lb;
     uint8_t adr_hb = l_adr_hb;
     uint8_t adr_xlb = l_adr_xlb;
+    
+    #endif
 
     #ifndef VIRTUAL_DRIVE
 
@@ -230,7 +242,7 @@ extern zenith_general_node* zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t
                     memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
                     memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
 
-                    memcpy((void*)&node[i], (void*)DATA_PORT, UINT8_T_SIZE);
+                    memcpy(&cache_node[i], (void*)DATA_PORT, UINT8_T_SIZE);
 
             #endif
                     break;
@@ -249,10 +261,10 @@ extern zenith_general_node* zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t
 
     #ifdef VIRTUAL_DRIVE
 
-    void* address =  (void*)(adr_xlb<<16 | adr_hb<<8 | adr_lb);
-    memcpy(node, address, ZENITH_NODE_SIZE);
-
+    if(cache_node != NULL){
+        memcpy(cache_node,cache_node->current_address, ZENITH_NODE_SIZE);
+    }
     #endif
 
-    return node;
+    return;
 }

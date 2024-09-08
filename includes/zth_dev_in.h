@@ -63,22 +63,20 @@
 /*  zenith_push() is used as a standard layer to write
     the filesystem changes and new node into the phisical 
     drive.
-    It accept an allocated node in ram and write it down into the
-    local drive and the type of driver.
+    It accept the type of driver and use the static node variable in ram to write down things.
     It return a boolean status variable to identify what's appened.
 
  */
 
-extern void zenith_push(zenith_general_node *node, uint8_t support_type);
+extern void zenith_push(uint8_t support_type);
 
 /*  zenith_pop() is used as a standard layer to get things from
-    the filesystem, it allocate automatically new static node in 
-    RAM ready to be read or write, and retur the RAM address of the node. 
+    the filesystem,  it use the static node variable in RAM to read and save things.
     It accept an address directly related to the local drive and get the node
     referred to it and the type of driver.
 */
 
-extern zenith_general_node* zenith_pop(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb,uint8_t support_type);
+extern void zenith_pop(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb,uint8_t support_type);
 
 
 

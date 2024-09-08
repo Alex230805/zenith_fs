@@ -11,11 +11,12 @@
 
 /* types of support and drive */
 
-//  #define VIRTUAL_DRIVE
-//  #define DIRECT_DRIVE_SUPPORT
-
+//#define VIRTUAL_DRIVE
 
 #define DIRECT_DRIVE_SUPPORT
+
+
+//#define DIRECT_DRIVE_SUPPORT
 
 /* ================================================= */
 
@@ -63,7 +64,7 @@
 /* node and fs tab structure */
 
 
-typedef struct{
+typedef struct zenith_gn{
     /* file name, max 8 chars */
     char name[NAME_LENGTH];
     /* type of node, if it's a folder or a directory */
@@ -87,13 +88,13 @@ typedef struct{
         uint8_t adr_xlb;
     #endif
 
-    #ifdef VIRUTAL_DRIVE
+    #ifdef VIRTUAL_DRIVE
         /* DevMode: the actual content of the file */
-        void* content[CONTENT_SIZE];
+        struct zenith_gn* content[CONTENT_SIZE];
         /* DevMode: address of the extension address */
-        void* extended;
+        struct zenith_gn* extended_adr;
         /* DevMode: current node adr */
-        void* current_address;
+        struct zenith_gn* current_address;
     #endif
 
 }zenith_general_node;
@@ -124,11 +125,11 @@ typedef struct{
     #ifdef VIRTUAL_DRIVE
 
     /* address for each node */
-    void* page_address[NODE_COUNT];
+    zenith_general_node* page_address[NODE_COUNT];
 
     /* first_node_address */
 
-    void* first_node;
+    zenith_general_node* first_node;
 
     #endif
 
@@ -151,7 +152,7 @@ typedef struct{
 
     /* static address variable in ram */
 
-    void* cache_adr = NULL;
+    static void* cache_adr = NULL;
 
 #endif
 
@@ -165,6 +166,14 @@ static uint8_t cache_adr_hb;
 static uint8_t cache_adr_xlb;
 
 #endif
+
+/* zenith_general_node variable in RAM */
+
+
+/* with the user-layer this variable would be allocated if it's not  */
+
+
+static zenith_general_node* cache_node = NULL;
 
 
 
