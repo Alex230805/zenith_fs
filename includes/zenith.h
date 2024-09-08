@@ -108,16 +108,27 @@ typedef struct{
     int free_space;
     int free_page;
     bool allocated_page[NODE_COUNT];
-    /* address for each node */
     #ifndef VIRTUAL_DRIVE
 
+    /* address for each node */
     uint8_t page_address[NODE_COUNT*3];
+
+    /* first_node_address */
+
+    uint8_t first_node_lb;
+    uint8_t first_node_hb;
+    uint8_t first_node_xlb;
 
     #endif
 
     #ifdef VIRTUAL_DRIVE
 
+    /* address for each node */
     void* page_address[NODE_COUNT];
+
+    /* first_node_address */
+
+    void* first_node;
 
     #endif
 
@@ -133,10 +144,74 @@ typedef struct{
 
 /* static variable and end-point */
 
-static uint8_t* virtual_drive = NULL;
+#ifdef VIRTUAL_DRIVE
+
+
+    static uint8_t* virtual_drive = NULL;
+
+    /* static address variable in ram */
+
+    void* cache_adr = NULL;
+
+#endif
+
+
+#ifndef VIRTUAL_DRIVE
+
+/* static address variable in ram */
+
+static uint8_t cache_adr_lb;
+static uint8_t cache_adr_hb;
+static uint8_t cache_adr_xlb;
+
+#endif
+
+
 
 #ifndef ZENITH_IMPLEMENTATION
 #define ZENITH_IMPLEMENTATION
+
+
+/*
+
+    This is the initialization function, call it if you want to 
+    initialize a new partition.
+
+*/
+extern void zenith_initFs(int size, char* part_name, uint8_t drive_type);
+
+/*
+
+    Function to alloc or dealloc new node, this funtion are not suppose 
+    to be used by any software directly.
+    Those function will be used by other zenith_fs functions with an higher 
+    lever of abstraction.
+
+*/
+
+
+/* 
+
+    malloc like function, write the fs_tab and use the static address variable 
+    in RAM to store the allocated address.
+    The other zenith function will read the saved address in ram and proceed to
+    operate.
+
+*/
+
+
+extern void zenith_malloc(int type, char*name);
+
+/* 
+
+    free like function, it accept a node and read the address from it and clear
+    the fs_tab. IT DOESN'T CLEAR BYTE-BY-BYTE the memory location. IT'S NOT A LOW 
+    LEVEL ERASING.
+
+*/
+
+extern void zenith_free(zenith_general_node node);
+
 
 #endif
 
