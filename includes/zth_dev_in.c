@@ -15,7 +15,6 @@ extern void zenith_push(uint8_t support_types){
     #endif
     uint32_t mem = 0xeaeaea;
 
-
     
     #ifndef VIRTUAL_DRIVE
 
@@ -102,25 +101,16 @@ extern void zenith_push(uint8_t support_types){
 
         switch(support_types){
             case 0:
+                memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
+                memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
+                memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
 
-            #ifdef DIRECT_DRIVE_SUPPORT
-        
-                    /* implementation with a direct connection with the drive */
+                memcpy((void*)DATA_PORT, &cache_node[i], UINT8_T_SIZE);
+                break;
 
-                    memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
-                    memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
-                    memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
-
-                    memcpy((void*)DATA_PORT, &cache_node[i], UINT8_T_SIZE);
-            #endif
-                    break;
-
-            case 1:
-                    /* some custom code */
-                    break;
-            case 2:
-                    /* some custom code */
-                    break;
+            /* add your case here to add support driver */
+            default:
+                break;
         }
 
     }
@@ -140,6 +130,32 @@ extern void zenith_push(uint8_t support_types){
 
 }
 
+extern void zenith_single_push(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb ,uint8_t byte, uint8_t support_type){
+  
+  #ifdef VIRTUAL_DRIVE
+
+  memcpy(cache_adr, &byte, UINT8_T_SIZE);
+
+  #endif
+
+  #ifndef VIRTUAL_DRIVE
+  
+  /* it matter the same i said before */
+
+  switch(support_type){
+    case 0:
+        memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
+        memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
+        memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
+
+        memcpy((void*)DATA_PORT,&byte, UINT8_T_SIZE);
+        break;
+    default:
+          break;
+  }
+
+  #endif
+}
 
 
 extern void zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t l_adr_xlb,uint8_t support_types){
@@ -236,23 +252,15 @@ extern void zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t l_adr_xlb,uint8
         switch(support_types){
             case 0:
 
-            #ifdef DIRECT_DRIVE_SUPPORT
+                memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
+                memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
+                memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
 
-                    memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
-                    memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
-                    memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
-
-                    memcpy(&cache_node[i], (void*)DATA_PORT, UINT8_T_SIZE);
-
-            #endif
-                    break;
-            
-            case 1:
-                    /* some custom code */
-                    break;
-            case 2:
-                    /* some custom code */
-                    break;
+                memcpy(&cache_node[i], (void*)DATA_PORT, UINT8_T_SIZE);
+                break;
+            /* add your case here to add support driver */
+            default:
+                break;
         }
 
     }
@@ -268,3 +276,37 @@ extern void zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t l_adr_xlb,uint8
 
     return;
 }
+
+
+
+extern uint8_t zenith_single_pop(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb, uint8_t support_types){
+  uint8_t byte = 0x00;
+
+  /* it matter the same i said before */
+
+  #ifndef VIRTUAL_DRIVE
+
+  switch(support_types){
+    case 0:
+        memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
+        memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
+        memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
+
+        memcpy(&byte, (void*)DATA_PORT, UINT8_T_SIZE);
+        break;
+      /* add your case here to add support driver */
+    default:
+        break;
+  }
+
+  #endif
+
+  #ifdef VIRTUAL_DRIVE
+
+  memcpy(&byte, cache_adr, UINT8_T_SIZE);
+
+  #endif
+
+  return byte;
+}
+

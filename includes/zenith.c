@@ -133,20 +133,14 @@ extern void zenith_malloc(int type, char*name){
     adr_hb = (uint8_t)full_address >> 8;
     adr_xlb = (uint8_t)full_address >> 16;
 
-    memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
-    memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
-    memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
-    memcpy(&data,(void*)DATA_PORT, UINT8_T_SIZE);
+    data = zenith_single_pop(adr_lb,adr_hb,adr_xlb,zenith_selected_driver);
 
     if(data == false){
 
       end = true;
       count+=1;
 
-      memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
-      memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
-      memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
-      memcpy((void*)DATA_PORT, &true_write, UINT8_T_SIZE);
+      zenith_single_push(adr_lb,adr_hb,adr_xlb, end, zenith_selected_driver);
 
     }else{
       full_address+=1;
@@ -162,19 +156,15 @@ extern void zenith_malloc(int type, char*name){
     adr_hb = (uint8_t)full_address >> 8;
     adr_xlb = (uint8_t)full_address >> 16;
 
-    memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
-    memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
-    memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
-
     switch(i){
       case 0:
-        memcpy(&cache_adr_lb, (void*)DATA_PORT, UINT8_T_SIZE);
+        cache_adr_lb = zenith_single_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
         break;
       case 1:
-        memcpy(&cache_adr_hb, (void*)DATA_PORT, UINT8_T_SIZE);
+        cache_adr_hb = zenith_single_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
         break;
       case 2:
-        memcpy(&cache_adr_xlb, (void*)DATA_PORT, UINT8_T_SIZE);
+        cache_adr_xlb = zenith_single_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
         break;
       default:
         break;
@@ -187,7 +177,7 @@ extern void zenith_malloc(int type, char*name){
   node.adr_xlb = cache_adr_xlb;
 
   memcpy(&cache_node[0],&node, ZENITH_NODE_SIZE);
-  zenith_push(0);
+  zenith_push(zenith_selected_driver);
 
 #endif
 
@@ -233,11 +223,7 @@ extern void zenith_free(){
       adr_hb = (uint8_t)full_address>>8;      
       adr_xlb = (uint8_t)full_address>>16;
 
-      memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
-      memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
-      memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
-
-      memcpy(&adr_data, (void*)DATA_PORT, UINT8_T_SIZE);
+      adr_data = zenith_single_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
 
       switch(i){
         case 0:
@@ -269,12 +255,7 @@ extern void zenith_free(){
 
   end = 0x00;
 
-  memcpy((void*)ADR_LB_PORT, &adr_lb, UINT8_T_SIZE);
-  memcpy((void*)ADR_HB_PORT, &adr_hb, UINT8_T_SIZE);
-  memcpy((void*)ADR_XLB_PORT, &adr_xlb, UINT8_T_SIZE);
-
-  /* use the end flag from before to write down a false statement for the referred flag */
-  memcpy((void*)DATA_PORT, &end, UINT8_T_SIZE);
+  zenith_single_push(adr_lb,adr_hb,adr_xlb, end, zenith_selected_driver);
 
   #endif
 

@@ -14,11 +14,8 @@
 
 //#define VIRTUAL_DRIVE
 
-#define DIRECT_DRIVE_SUPPORT
-
-
 //#define DIRECT_DRIVE_SUPPORT
-//
+
 //#define ZENITH_EXCLUDE_INIT
 
 
@@ -184,13 +181,23 @@ static uint8_t cache_adr_xlb;
 
 static zenith_general_node* cache_node = NULL;
 
+/* driver types */
 
+#define DEFAULT_DRIVER 0x00 /* parallel support */
+
+#define DRIVER_1 0x01 /* custom support */
+#define DRIVER_2 0x02 /* custom support */
+#define DRIVER_3 0x03 /* custom support */
+#define DRIVER_4 0x04 /* custom support */
+
+/* selected driver variable is used to change in all the zenith function the way to do call in the interface layer */
+
+static uint8_t zenith_selected_driver = DEFAULT_DRIVER;
 
 /*
 
     This is the initialization function, call it if you want to 
     initialize a new partition.
-
 
 */
 

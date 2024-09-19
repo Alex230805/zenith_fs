@@ -80,6 +80,27 @@ extern void zenith_pop(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb,uint8_t sup
 
 
 
+/*
+  zenith push like function but it write a single byte.
+  it read the address from the cache and the byte 
+  passed by argument and write it down to the drive
+
+ */
+
+
+extern void zenith_single_push(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb, uint8_t support_type, uint8_t byte);
+
+
+/*
+  zenith pop like function but it return a single byte.
+  it read the address from the cache and return the data
+  from there.
+
+ */
+
+extern uint8_t zenith_single_pop(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb,uint8_t support_types);
+
+
 
 #ifndef ZTH_DEV_IN_IMPLEMENTATION
 #define ZTH_DEV_IN_IMPLEMENTATION
