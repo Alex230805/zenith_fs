@@ -18,6 +18,9 @@
 
 
 //#define DIRECT_DRIVE_SUPPORT
+//
+//#define ZENITH_EXCLUDE_INIT
+
 
 /* ================================================= */
 
@@ -188,9 +191,16 @@ static zenith_general_node* cache_node = NULL;
     This is the initialization function, call it if you want to 
     initialize a new partition.
 
+
 */
+
+#ifndef ZENITH_EXCLUDE_INIT
+
+
 extern void zenith_initFs(int size, char* part_name, uint8_t drive_type);
 
+
+#endif
 /*
 
     Function to alloc or dealloc new node, this funtion are not suppose 

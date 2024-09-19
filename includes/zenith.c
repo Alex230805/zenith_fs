@@ -4,6 +4,9 @@
 
 /* TODO: create and assembly function dedicated to the increment of 32bit number ( only 24 bit are used ) */
 
+#ifndef ZENITH_EXCLUDE_INIT
+
+
 extern void zenith_initFs(int size, char* part_name, uint8_t drive_type){
   #ifndef VIRTUAL_DRIVE
 
@@ -60,6 +63,7 @@ extern void zenith_initFs(int size, char* part_name, uint8_t drive_type){
     return;
 }
 
+#endif
 
 extern void zenith_malloc(int type, char*name){
     

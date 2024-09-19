@@ -47,3 +47,21 @@ Those are located on top of the zenith.h header file
 </strong>
 
 ### for more information check out the zth_dev_in.h header library
+
+
+## Initialize a new filesystem
+
+Do tue the nature of the phisical machine where zenith will be installed it's not possible 
+to generate a new filesystem directly from the running 8bit machine because of the size of
+the fstab that would occupy the entire RAM memory if you try to create a very big partition.
+That's why when zenith it's compiled without the <strong>VIRTUAL_DRIVE</strong> precompiler 
+directive <strong>zenith_initfs()</strong> would be built to only run on a modern computer. 
+
+
+zenith_initfs() will build a binary file with the partition table written inside ready to be 
+flashed in a ROM or in any support adressed by <strong>zenith_push()</strong> and <strong>zenith_pop()</strong> ( so the interface layer from zenith and the Kernel/machine ).
+
+
+The other function would be accessible by a running 8bit system without problems.
+
+#### For that it's possible to exclude from the compilation zenith_initfs() to generate a smaller binary.
