@@ -40,11 +40,8 @@ it's a simple switch case.
 The default implementation is a simple parallel connection with the address bus and it's possible to add newest ones by add a new case in the switch and 
 simply integrate the writing and readign using standards kernel's endpoint.
 
+It's possible to update the selected driver and automatically the interface layer will write in new device (if the driver is written).
 
-<strong>Uncomment the necessary pre-compiler constant to enable the default support or to compile in Developer mode.
-
-Those are located on top of the zenith.h header file  
-</strong>
 
 ### for more information check out the zth_dev_in.h header library
 
@@ -54,13 +51,14 @@ Those are located on top of the zenith.h header file
 Do tue the nature of the phisical machine where zenith will be installed it's not possible 
 to generate a new filesystem directly from the running 8bit machine because of the size of
 the fstab that would occupy the entire RAM memory if you try to create a very big partition.
+
+### I plan to integrate a dedicated initialize function to be used on 8 bit computer, but for now is not necessary
+
 That's why when zenith it's compiled without the <strong>VIRTUAL_DRIVE</strong> precompiler 
 directive <strong>zenith_initfs()</strong> would be built to only run on a modern computer. 
 
-
 zenith_initfs() will build a binary file with the partition table written inside ready to be 
 flashed in a ROM or in any support adressed by <strong>zenith_push()</strong> and <strong>zenith_pop()</strong> ( so the interface layer from zenith and the Kernel/machine ).
-
 
 The other function would be accessible by a running 8bit system without problems.
 
