@@ -7,8 +7,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <ctype.h>
-
-
+#include <string.h>
+#include "./zth_dev_in.h"
+ 
 /* types of support and drive */
 
 //#define VIRTUAL_DRIVE
@@ -51,11 +52,11 @@
 
 /* permission and node types */
 
-#define W_PERM  (0b00000011 | PERM_MASK)
-#define R_PERM  (0b00001100 | PERM_MASK)
-#define E_PERM  (0b00110000 | PERM_MASK)
+#define W_PERM  ( 0b00000011 )
+#define R_PERM  ( 0b00001100 )
+#define E_PERM  ( 0b00110000 )
 
-#define TYPES_MASK 0xf
+#define TYPES_MASK 0xf0
 #define FILE_TYPE ( TYPES_MASK | 0x0d )
 #define DIR_TYPE ( TYPES_MASK | 0x0e)
 
@@ -104,10 +105,9 @@ typedef struct{
     /* name for the partition */
     char name[NAME_LENGTH];
     /* partition size, max 16mb */
-    int partition_size; 
+    uint8_t partition_size; 
     /* allocated node variable */
-    int free_space;
-    int free_page;
+    uint8_t free_page;
     bool allocated_page[NODE_COUNT];
     #ifndef VIRTUAL_DRIVE
 
@@ -143,6 +143,9 @@ typedef struct{
 #define ZENITH_FSTAB_SIZE (sizeof(zenith_fstab))
 
 
+#define LOCAL_SAVING_PATH "/out/fstab.bin"
+#define DATA_FROM_FLAG_OFFSET (NODE_COUNT | CHAR_SIZE | UINT8_T_SIZE*2);
+
 /* static variable and end-point */
 
 #ifdef VIRTUAL_DRIVE
@@ -153,6 +156,9 @@ typedef struct{
     /* static address variable in ram */
 
     static void* cache_adr = NULL;
+
+
+    zenith_fstab fstab_global;
 
 #endif
 
@@ -175,10 +181,6 @@ static uint8_t cache_adr_xlb;
 
 static zenith_general_node* cache_node = NULL;
 
-
-
-#ifndef ZENITH_IMPLEMENTATION
-#define ZENITH_IMPLEMENTATION
 
 
 /*
@@ -213,15 +215,17 @@ extern void zenith_malloc(int type, char*name);
 
 /* 
 
-    free like function, it accept a node and read the address from it and clear
-    the fs_tab. IT DOESN'T CLEAR BYTE-BY-BYTE the memory location. IT'S NOT A LOW 
-    LEVEL ERASING.
+    free like function, it use the cache address in RAM for reference and clear the fstab.
+    IT DOESN'T CLEAR BYTE-BY-BYTE the memory location. IT'S NOT A LOW LEVEL ERASING.
 
 */
 
-extern void zenith_free(zenith_general_node node);
+extern void zenith_free();
 
 
+
+#ifndef ZENITH_IMPLEMENTATION
+#define ZENITH_IMPLEMENTATION
 #endif
 
 

@@ -19,6 +19,9 @@
 /* TODO: create functions to link directly usable functions from the library files */
 
 /* TODO: create a start function to initialize the static zenith variable  */
+
+extern void _initialize();
+
 #ifndef ZTH_FN_IMPLEMENTATION
 #define ZTH_FN_IMPLEMENTATION
 
