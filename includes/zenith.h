@@ -177,6 +177,7 @@ static uint8_t cache_adr_xlb;
 
 
 static zenith_general_node* cache_node = NULL;
+static zenith_general_node* cache_node_2 = NULL;
 
 /* static copy of the first node in RAM, use for navigation */
 
@@ -264,7 +265,17 @@ extern void zenith_set_target(uint8_t target);
 
 /* search in the node tree and find out if somethings called "name" is present */
 
+#ifndef VIRTUAL_DRIVE
+
 extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char* name);
+
+#endif
+
+#ifdef VIRTUAL_DRIVE
+
+extern bool zenith_is_present(zenith_general_node*address, char* name);
+
+#endif
 
 /* get root node, aka the first node of the disk, and save it in a copy in RAM ( it will be used to navigate the root tree ) */
 
