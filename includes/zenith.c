@@ -261,3 +261,63 @@ extern void zenith_free(){
 
   return;
 }
+
+
+
+extern void zenith_set_target(uint8_t target){
+  
+  /* set target output for zenith i/o interface, take a look at the zenith.h header for more info */
+
+  #ifndef VIRTUAL_DRIVE
+  
+  if(target < 0x0A){
+    zenith_selected_driver = target;
+  }  
+  
+  #endif
+  
+  return;
+}
+
+
+
+extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char* name){
+  bool state = false;
+
+  #ifndef VIRTUAL_DRIVE
+
+  #endif
+
+  #ifdef VIRTUAL_DRIVE
+
+  #endif
+
+  return state;
+}
+
+
+extern void zenith_get_root(){
+
+  #ifndef VIRTUAL_DRIVE
+
+  #endif
+
+  #ifdef VIRTUAL_DRIVE
+
+  #endif
+
+  return;
+}
+
+extern void zenith_navigate(char*path){
+
+  #ifndef VIRTUAL_DRIVE
+
+  #endif
+
+  #ifdef VIRTUAL_DRIVE
+
+  #endif
+
+  return;
+}

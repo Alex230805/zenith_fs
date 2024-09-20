@@ -11,5 +11,5 @@ extern void _initialize(){
   #endif 
   
   cache_node = (zenith_general_node*)malloc(ZENITH_NODE_SIZE);
-
+  zenith_root_node = (zenith_general_node*)malloc(ZENITH_NODE_SIZE);
 }

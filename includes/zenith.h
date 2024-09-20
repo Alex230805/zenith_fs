@@ -165,7 +165,7 @@ typedef struct{
 
 #ifndef VIRTUAL_DRIVE
 
-/* static address variable in ram */
+/* static address variable in ram, use only as a return endpoint, so when a function, like malloc and free, need to return an entire address */
 
 static uint8_t cache_adr_lb;
 static uint8_t cache_adr_hb;
@@ -173,13 +173,16 @@ static uint8_t cache_adr_xlb;
 
 #endif
 
-/* zenith_general_node variable in RAM */
-
-
-/* with the user-layer this variable would be allocated if it's not  */
+/* zenith_general_node variable in RAM, use as a return endpoint */
 
 
 static zenith_general_node* cache_node = NULL;
+
+/* static copy of the first node in RAM, use for navigation */
+
+static zenith_general_node* zenith_root_node = NULL;
+
+
 
 /* driver types */
 
@@ -189,6 +192,13 @@ static zenith_general_node* cache_node = NULL;
 #define DRIVER_2 0x02 /* custom support */
 #define DRIVER_3 0x03 /* custom support */
 #define DRIVER_4 0x04 /* custom support */
+#define DRIVER_5 0x05 /* custom support */
+#define DRIVER_6 0x06 /* custom support */
+#define DRIVER_7 0x07 /* custom support */
+#define DRIVER_8 0x08 /* custom support */  
+#define DRIVER_9 0x09 /* custom support */
+#define DRIVER_10 0x0A /* custom support */
+
 
 /* selected driver variable is used to change in all the zenith function the way to do call in the interface layer */
 
@@ -239,6 +249,38 @@ extern void zenith_malloc(int type, char*name);
 
 extern void zenith_free();
 
+
+/* 
+    Set target for Zenith I/O layer
+
+ */
+
+
+extern void zenith_set_target(uint8_t target);
+
+
+
+/* TODO: define those functions */
+
+/* search in the node tree and find out if somethings called "name" is present */
+
+extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char* name);
+
+/* get root node, aka the first node of the disk, and save it in a copy in RAM ( it will be used to navigate the root tree ) */
+
+extern void zenith_get_root();
+
+/*
+  navigate in a specific path and it return the static node copy in RAM.
+  For reference if you need to navigate into a specific directory, it start to
+  navigate from the root_point and use a compination of zenith_is_present, zenith_pop
+  and the single name if each path to find out the tree and finally return in the cache
+  node the copy of the desire folder, ready to be process by any other command
+
+
+ */
+
+extern void zenith_navigate(char*path);
 
 
 #ifndef ZENITH_IMPLEMENTATION
