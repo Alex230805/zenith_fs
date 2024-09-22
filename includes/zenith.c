@@ -96,7 +96,7 @@ break;
   node.extended_adr = NULL;
   int pos = 0;
 
-  while(fstab_global.allocated_page[i] == true){
+  while(fstab_global.allocated_page[pos] == true){
     pos+=1;
   }
   
@@ -148,7 +148,7 @@ break;
     }
   }
 
-  full_address = DATA_FROM_FLAG_OFFSET + (count*3);
+  full_address = (uint8_t)DATA_FROM_FLAG_OFFSET + (count*3);
   
   for(int i=0;i<3;i++){
 
@@ -280,21 +280,66 @@ extern void zenith_set_target(uint8_t target){
 }
 
 
+#ifndef VIRTUAL_DRIVE
 
 extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char* name){
   bool state = false;
+  bool end = false;
+  uint8_t index = 0;
+  
+  uint8_t lb,hb,xlb;
 
-  #ifndef VIRTUAL_DRIVE
+    
+  zenith_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
+  memcpy(cache_node_2, cache_node, ZENITH_NODE_SIZE);
 
-  #endif
+  while(!end && index < CONTENT_SIZE){
+      lb = cache_node_2->content[index];
+      hb = cache_node_2->content[index+1]; 
+      xlb = cache_node_2->content[index+2];
 
-  #ifdef VIRTUAL_DRIVE
+      if(lb != 0x00 && hb != 0x00 && xlb != 0x00){
+        zenith_pop(lb,hb,xlb, zenith_selected_driver);
+        if(strcmp(cache_node->name, name) == 0){
+          end = true;
+          state = true;
+        }
+      }
+      index+=3;
+  }
 
-  #endif
-
+  memset(cache_node_2, 0x00, ZENITH_NODE_SIZE);
+  memset(cache_node, 0x00, ZENITH_NODE_SIZE);
+    
   return state;
 }
 
+#endif
+
+#ifdef VIRTUAL_DRIVE
+
+extern bool zenith_is_present(zenith_general_node*address, char* name){
+  bool state = false;
+  bool end = false;
+  uint8_t count = 0;
+  zenith_general_node* ptr = NULL;
+  
+  while(!end && count < CONTENT_SIZE){
+    if(address->content[count] != NULL){
+      ptr = address->content[count];
+      if(strcmp(ptr->name, name) == 0){
+        end = true;
+        state = true;
+      }
+    }
+    count++;
+  }
+
+  return state;
+  
+}
+
+#endif
 
 extern void zenith_get_root(){
 
@@ -329,7 +374,7 @@ extern void zenith_get_root(){
     
   zenith_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
   memcpy(zenith_root_node, cache_node, ZENITH_NODE_SIZE);
-    
+
   #endif
 
   #ifdef VIRTUAL_DRIVE
