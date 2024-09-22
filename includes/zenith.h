@@ -143,8 +143,11 @@ typedef struct{
 #define ZENITH_FSTAB_SIZE (sizeof(zenith_fstab))
 
 
+
 #define LOCAL_SAVING_PATH "/out/fstab.bin"
-#define DATA_FROM_FLAG_OFFSET (NODE_COUNT | CHAR_SIZE | UINT8_T_SIZE*2);
+#define DATA_FROM_FLAG_OFFSET ((sizeof(bool)*NODE_COUNT) | (CHAR_SIZE*NAME_LENGTH) | (UINT8_T_SIZE*2));
+#define DATA_FROM_ROOT_OFFSET ( DATA_FROM_FLAG_OFFSET | (UINT8_T_SIZE*(NODE_COUNT*3)) )
+
 
 /* static variable and end-point */
 

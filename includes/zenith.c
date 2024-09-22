@@ -84,7 +84,7 @@ extern void zenith_malloc(int type, char*name){
         break;
     case DIR_TYPE:
         node.perm = node.perm | PERM_MASK_DIR;
-        break;
+break;
     default:
         return;
   }
@@ -299,11 +299,41 @@ extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, c
 extern void zenith_get_root(){
 
   #ifndef VIRTUAL_DRIVE
+  
+  uint32_t start_address = DATA_FROM_ROOT_OFFSET;
 
+  uint8_t adr_lb = 0x00;
+  uint8_t adr_hb = 0x00;
+  uint8_t adr_xlb = 0x00;
+
+  uint8_t lb,hb,xlb;
+
+  for(int i=0;i<3;i++){
+    lb = (uint8_t)start_address;
+    hb = (uint8_t)start_address>>8;
+    xlb = (uint8_t)start_address>>16;
+
+    switch(i){
+      case 0:
+        adr_lb = zenith_single_pop(lb,hb,xlb, zenith_selected_driver);
+        break;
+      case 1:
+        adr_hb = zenith_single_pop(lb,hb,xlb, zenith_selected_driver);
+        break;
+      case 2:
+        adr_xlb = zenith_single_pop(lb,hb,xlb, zenith_selected_driver);
+        break;
+    }
+    start_address+=1;
+  }
+    
+  zenith_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
+  memcpy(zenith_root_node, cache_node, ZENITH_NODE_SIZE);
+    
   #endif
 
   #ifdef VIRTUAL_DRIVE
-
+    memcpy(zenith_root_node, fstab.first_node, ZENITH_NODE_SIZE);
   #endif
 
   return;
