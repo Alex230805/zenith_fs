@@ -303,6 +303,9 @@ extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, c
         if(strcmp(cache_node->name, name) == 0){
           end = true;
           state = true;
+          cache_adr_lb = cache_node->adr_lb;
+          cache_adr_hb = cache_node->adr_hb;
+          cache_adr_xlb = cache_node->adr_xlb;
         }
       }
       index+=3;
@@ -330,6 +333,7 @@ extern bool zenith_is_present(zenith_general_node*address, char* name){
       if(strcmp(ptr->name, name) == 0){
         end = true;
         state = true;
+        cache_adr = ptr;
       }
     }
     count++;
@@ -378,7 +382,7 @@ extern void zenith_get_root(){
   #endif
 
   #ifdef VIRTUAL_DRIVE
-    memcpy(zenith_root_node, fstab.first_node, ZENITH_NODE_SIZE);
+    memcpy(zenith_root_node, fstab_global.first_node, ZENITH_NODE_SIZE);
   #endif
 
   return;
@@ -386,11 +390,38 @@ extern void zenith_get_root(){
 
 extern void zenith_navigate(char*path){
 
+  char* token = strtok(path,"/");
   #ifndef VIRTUAL_DRIVE
+   
+  cache_adr_lb = zenith_root_node->adr_lb;
+  cache_adr_hb = zenith_root_node->adr_hb;
+  cache_adr_xlb = zenith_root_node->adr_xlb;
+
+  while(token != NULL){
+    if(!zenith_is_present(cache_adr_lb, cache_adr_hb, cache_adr_xlb, token)){
+      printf("Error: no such file in the directory: %s", token);
+      return;
+    }
+    token = strtok(NULL, "/");
+  }
+
+  zenith_pop(cache_adr_lb,cache_adr_hb,cache_adr_xlb, zenith_selected_driver);
 
   #endif
 
   #ifdef VIRTUAL_DRIVE
+  
+  cache_adr = fstab_global.first_node;
+    
+  while(token != NULL){
+    if(!zenith_is_present(cache_adr,token)){
+      printf("Error: no such file in the directory: %s", token);
+      return;
+    }
+    token = strtok(NULL, "/");
+  }
+
+  memcpy(cache_node, cache_adr, ZENITH_NODE_SIZE);
 
   #endif
 
