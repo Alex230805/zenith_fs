@@ -400,6 +400,11 @@ extern void zenith_navigate(char*path){
   while(token != NULL){
     if(!zenith_is_present(cache_adr_lb, cache_adr_hb, cache_adr_xlb, token)){
       printf("Error: no such file in the directory: %s", token);
+      
+      cache_adr_lb = 0x00;
+      cache_adr_hb = 0x00;
+      cache_adr_xlb = 0x00;
+
       return;
     }
     token = strtok(NULL, "/");
@@ -416,6 +421,7 @@ extern void zenith_navigate(char*path){
   while(token != NULL){
     if(!zenith_is_present(cache_adr,token)){
       printf("Error: no such file in the directory: %s", token);
+      cache_adr = NULL;
       return;
     }
     token = strtok(NULL, "/");
