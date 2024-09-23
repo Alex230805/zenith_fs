@@ -68,12 +68,20 @@ void zenith_mkdir(char*path, char*name){
         index+=3;
       }
     }
+    if(index == CONTENT_SIZE){
+      /* no space available, use the extension address capabilities */
+      zenith_free();
+      printf("NOTE: unable to allocate, node extension address integration is under development");
+      printf("NOTE: unable to create beacuse of lack of space");
+      return;
+    }
     /* move the node to the main one */
     memcpy(cache_node,cache_node_2, ZENITH_NODE_SIZE);
     /* push it into trhe drive */
     zenith_push(zenith_selected_driver);
 
   }else{
+    /* if there is somethings named in the same way you want to name your directory */
     printf("Error: name already taken");
     return;
   }
