@@ -160,33 +160,33 @@ int __zenith_rmdir(uint8_t lb, uint8_t hb, uint8_t xlb, char*name){
     adr_xlb = cache_node_2->content[index+2];
 
     /* grep the folder or the file inside */
-    zenith_pop(adr_lb, adr_hb,adr_xlb, zenith_selected_driver);
-    
-    if(strcmp(cache_node->name, name) == 0 && cache_node->type == DIR_TYPE){
-      /* save node address for wipe it out of the filesystem table */
-      cache_adr_lb = cache_node->adr_lb;
-      cache_adr_hb = cache_node->adr_hb;
-      cache_adr_xlb = cache_node->adr_xlb;
-      /* call the zenith_free function */
-      zenith_free();
-      /* clear the pointer inside the folder */
-      cache_node_2->content[index] = 0x00;
-      cache_node_2->content[index+1] = 0x00;
-      cache_node_2->content[index+2] = 0x00;
-      /* prepare to push */
-      memcpy(cache_node, cache_node_2, ZENITH_NODE_SIZE);
-      /* push updated node */
-      zenith_push(zenith_selected_driver);
-      /* end cicle */
-      state = 1;
-      end = true;
+    if(adr_lb != 0x00 && adr_hb != 0x00 && adr_xlb != 0x00){
+      zenith_pop(adr_lb, adr_hb,adr_xlb, zenith_selected_driver);
 
-    }else{
+      if(strcmp(cache_node->name, name) == 0 && cache_node->type == DIR_TYPE){
+        /* save node address for wipe it out of the filesystem table */
+        cache_adr_lb = cache_node->adr_lb;
+        cache_adr_hb = cache_node->adr_hb;
+        cache_adr_xlb = cache_node->adr_xlb;
+        /* call the zenith_free function */
+        zenith_free();
+        /* clear the pointer inside the folder */
+        cache_node_2->content[index] = 0x00;
+        cache_node_2->content[index+1] = 0x00;
+        cache_node_2->content[index+2] = 0x00;
+        /* prepare to push */
+        memcpy(cache_node, cache_node_2, ZENITH_NODE_SIZE);
+        /* push updated node */
+        zenith_push(zenith_selected_driver);
+        /* end cicle */
+        state = 1;
+        end = true;
+    }
+  }else{
       /* increment the pointer if there is no element named in the same way */
       index +=3;
     }
   }
-
   /* if there is no menber found */
   if(!state){
     /* check if may be in the extension of the folder */
