@@ -13,7 +13,13 @@
 
 /* zenith function to create a directory and store the address */
 
-void zenith_mkdir(char*path, char*name);
+int zenith_mkdir(char*path, char*name);
+
+#ifndef VIRTUAL_DRIVE
+
+int __zenith_mkdir(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb, char*name);
+
+#endif
 
 /* zenith function to remove a directory and return a boolean state abount whats happened */
 
