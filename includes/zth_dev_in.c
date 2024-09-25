@@ -117,27 +117,12 @@ extern void zenith_push(uint8_t support_types){
 
     #endif
 
-    #ifdef VIRTUAL_DRIVE
-    
-    if(cache_node != NULL){
-        memcpy(cache_node->current_address,cache_node,ZENITH_NODE_SIZE);
-    }
-
-    #endif
-
-
     return;
 
 }
 
 extern void zenith_single_push(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb ,uint8_t byte, uint8_t support_type){
-  
-  #ifdef VIRTUAL_DRIVE
-
-  memcpy(cache_adr, &byte, UINT8_T_SIZE);
-
-  #endif
-
+ 
   #ifndef VIRTUAL_DRIVE
   
   /* it matter the same i said before */
@@ -267,13 +252,6 @@ extern void zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t l_adr_xlb,uint8
 
     #endif
 
-    #ifdef VIRTUAL_DRIVE
-
-    if(cache_node != NULL){
-        memcpy(cache_node,cache_node->current_address, ZENITH_NODE_SIZE);
-    }
-    #endif
-
     return;
 }
 
@@ -298,12 +276,6 @@ extern uint8_t zenith_single_pop(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb, 
     default:
         break;
   }
-
-  #endif
-
-  #ifdef VIRTUAL_DRIVE
-
-  memcpy(&byte, cache_adr, UINT8_T_SIZE);
 
   #endif
 

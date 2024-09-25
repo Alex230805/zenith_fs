@@ -15,7 +15,6 @@ int zenith_mkdir(char*path, char*name){
    * */
   int state = 0;   
 
-  #ifndef VIRTUAL_DRIVE
   /* check if the path or the name are a null pointer */
   if(path == NULL || name == NULL){
     /* return error */
@@ -51,12 +50,10 @@ int zenith_mkdir(char*path, char*name){
         break;
   }
   
-  #endif
 
   return state;
 }
 
-#ifndef VIRTUAL_DRIVE
 
 int __zenith_mkdir(uint8_t lb,uint8_t hb,uint8_t xlb, char*name){
   bool end = false;
@@ -136,7 +133,6 @@ int __zenith_mkdir(uint8_t lb,uint8_t hb,uint8_t xlb, char*name){
   }
   return state;
 }
-#endif
 
 
 /* zenith function to remove a directory and return a boolean state abount whats happened */
@@ -145,7 +141,6 @@ int zenith_rmdir(char*path, char*name){
 
   int state = 0;
 
-  #ifndef VIRTUAL_DRIVE
    /* check if the path or the name are a null pointer */
   if(path == NULL || name == NULL){
     /* return error */
@@ -174,12 +169,10 @@ int zenith_rmdir(char*path, char*name){
         break;
   }
   
-  #endif
 
   return state;
 }
 
-#ifndef VIRTUAL_DRIVE
 
 int __zenith_rmdir(uint8_t lb, uint8_t hb, uint8_t xlb, char*name){
   bool end = false;
@@ -261,7 +254,6 @@ int __zenith_rmdir(uint8_t lb, uint8_t hb, uint8_t xlb, char*name){
 
 }
 
-#endif
 
 /* zenith function to move a directory from a destination to another, you can change the name in the process */
 

@@ -8,11 +8,9 @@
 
 
 extern void zenith_initFs(int size, char* part_name, uint8_t drive_type){
-  #ifndef VIRTUAL_DRIVE
 
   FILE* fstab_saved = fopen(LOCAL_SAVING_PATH, "w+");
 
-  #endif
 
   zenith_fstab fstab;
   strcpy(fstab.name, part_name);
@@ -23,44 +21,28 @@ extern void zenith_initFs(int size, char* part_name, uint8_t drive_type){
     fstab.allocated_page[i] = false;
   }
 
-  #ifdef VIRTUAL_DRIVE
+
+
+  uint32_t mem_adr = 0x00000000;
 
   for(int i=ZENITH_FSTAB_SIZE;i<NODE_COUNT;i++){
-
-    fstab.page_address[i] = (zenith_general_node*)&virtual_drive[i*NODE_COUNT];
-
+    fstab.page_address[i] = (uint8_t)mem_adr;
+    fstab.page_address[i+1] = (uint8_t)mem_adr>>8;
+    fstab.page_address[i+2] = (uint8_t)mem_adr>>16;
+    mem_adr+=NODE_COUNT;
   }
 
-  fstab.allocated_page[0] = true;
-  memcpy(&fstab, virtual_drive, ZENITH_FSTAB_SIZE);
-
-  fstab_global = fstab;
-
-  #endif
-
-  #ifndef VIRTUAL_DRIVE
-
-    uint32_t mem_adr = 0x00000000;
-
-    for(int i=ZENITH_FSTAB_SIZE;i<NODE_COUNT;i++){
-        fstab.page_address[i] = (uint8_t)mem_adr;
-        fstab.page_address[i+1] = (uint8_t)mem_adr>>8;
-        fstab.page_address[i+2] = (uint8_t)mem_adr>>16;
-        mem_adr+=NODE_COUNT;
-    }
-
-    fstab.first_node_lb = fstab.page_address[0];
-    fstab.first_node_hb = fstab.page_address[1];
-    fstab.first_node_xlb = fstab.page_address[2];
+  fstab.first_node_lb = fstab.page_address[0];
+  fstab.first_node_hb = fstab.page_address[1];
+  fstab.first_node_xlb = fstab.page_address[2];
 
 
-    /* write dow a binary file with the fstab */
-    fseek(fstab_saved, 0x00, SEEK_SET);
-    fwrite(&fstab, ZENITH_FSTAB_SIZE, 1, fstab_saved); 
-    fclose(fstab_saved);
-    #endif
+  /* write dow a binary file with the fstab */
+  fseek(fstab_saved, 0x00, SEEK_SET);
+  fwrite(&fstab, ZENITH_FSTAB_SIZE, 1, fstab_saved); 
+  fclose(fstab_saved);
 
-    return;
+  return;
 }
 
 #endif
@@ -90,26 +72,6 @@ break;
   }
   node.type = type;
 
-
-  #ifdef VIRTUAL_DRIVE    
-
-  node.extended_adr = NULL;
-  int pos = 0;
-
-  while(fstab_global.allocated_page[pos] == true){
-    pos+=1;
-  }
-  
-  fstab_global.allocated_page[pos+1] = true;
-
-  node.current_address = fstab_global.page_address[pos+1];
-  memcpy((void*)node.current_address, &node, ZENITH_NODE_SIZE);
-  
-  cache_node = node.current_address;
-
-  #endif
-
-  #ifndef VIRTUAL_DRIVE
 
   node.extended_adr_lb = 0x00;
   node.extended_adr_hb = 0x00;
@@ -179,8 +141,6 @@ break;
   memcpy(&cache_node[0],&node, ZENITH_NODE_SIZE);
   zenith_push(zenith_selected_driver);
 
-#endif
-
   return;
 }
 
@@ -190,22 +150,6 @@ extern void zenith_free(){
   bool end = false;
   uint16_t erase_position = 0x00000;
 
-  #ifdef VIRTUAL_DRIVE
-
-  /* free using the virtual drive */
-
-  while(!end && erase_position < (uint16_t)NODE_COUNT){
-    if((void*)fstab_global.page_address[erase_position] == cache_adr){
-      end = true;
-      fstab_global.allocated_page[erase_position] = false;
-    }else{
-      erase_position+=1;
-    }
-  }
-
-  #endif
-
-  #ifndef VIRTUAL_DRIVE
 
   uint32_t full_address = DATA_FROM_FLAG_OFFSET;
   uint8_t count = 0;
@@ -257,8 +201,6 @@ extern void zenith_free(){
 
   zenith_single_push(adr_lb,adr_hb,adr_xlb, end, zenith_selected_driver);
 
-  #endif
-
   return;
 }
 
@@ -267,20 +209,15 @@ extern void zenith_free(){
 extern void zenith_set_target(uint8_t target){
   
   /* set target output for zenith i/o interface, take a look at the zenith.h header for more info */
-
-  #ifndef VIRTUAL_DRIVE
-  
+ 
   if(target < 0x0A){
     zenith_selected_driver = target;
   }  
-  
-  #endif
-  
+    
   return;
 }
 
 
-#ifndef VIRTUAL_DRIVE
 
 extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char* name){
   bool state = false;
@@ -317,37 +254,9 @@ extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, c
   return state;
 }
 
-#endif
-
-#ifdef VIRTUAL_DRIVE
-
-extern bool zenith_is_present(zenith_general_node*address, char* name){
-  bool state = false;
-  bool end = false;
-  uint8_t count = 0;
-  zenith_general_node* ptr = NULL;
-  
-  while(!end && count < CONTENT_SIZE){
-    if(address->content[count] != NULL){
-      ptr = address->content[count];
-      if(strcmp(ptr->name, name) == 0){
-        end = true;
-        state = true;
-        cache_adr = ptr;
-      }
-    }
-    count++;
-  }
-
-  return state;
-  
-}
-
-#endif
 
 extern void zenith_get_root(){
 
-  #ifndef VIRTUAL_DRIVE
   
   uint32_t start_address = DATA_FROM_ROOT_OFFSET;
 
@@ -379,19 +288,12 @@ extern void zenith_get_root(){
   zenith_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
   memcpy(zenith_root_node, cache_node, ZENITH_NODE_SIZE);
 
-  #endif
-
-  #ifdef VIRTUAL_DRIVE
-    memcpy(zenith_root_node, fstab_global.first_node, ZENITH_NODE_SIZE);
-  #endif
-
   return;
 }
 
 extern void zenith_navigate(char*path){
 
   char* token = strtok(path,"/");
-  #ifndef VIRTUAL_DRIVE
    
   cache_adr_lb = zenith_root_node->adr_lb;
   cache_adr_hb = zenith_root_node->adr_hb;
@@ -411,25 +313,6 @@ extern void zenith_navigate(char*path){
   }
 
   zenith_pop(cache_adr_lb,cache_adr_hb,cache_adr_xlb, zenith_selected_driver);
-
-  #endif
-
-  #ifdef VIRTUAL_DRIVE
-  
-  cache_adr = fstab_global.first_node;
-    
-  while(token != NULL){
-    if(!zenith_is_present(cache_adr,token)){
-      printf("Error: no such file in the directory: %s", token);
-      cache_adr = NULL;
-      return;
-    }
-    token = strtok(NULL, "/");
-  }
-
-  memcpy(cache_node, cache_adr, ZENITH_NODE_SIZE);
-
-  #endif
 
   return;
 }

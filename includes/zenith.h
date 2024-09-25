@@ -74,29 +74,16 @@ typedef struct zenith_gn{
     uint8_t perm;
     /* variable to check if the file is extended to another */
     bool extended;
-    
-    #ifndef VIRTUAL_DRIVE
-        /* the actual content of the file */
-        uint8_t content[CONTENT_SIZE];
-
-        /* address of the extension address */
-        uint8_t extended_adr_lb;
-        uint8_t extended_adr_hb;
-        uint8_t extended_adr_xlb;
-         /* current node adr */
-        uint8_t adr_lb;
-        uint8_t adr_hb;
-        uint8_t adr_xlb;
-    #endif
-
-    #ifdef VIRTUAL_DRIVE
-        /* DevMode: the actual content of the file */
-        struct zenith_gn* content[CONTENT_SIZE];
-        /* DevMode: address of the extension address */
-        struct zenith_gn* extended_adr;
-        /* DevMode: current node adr */
-        struct zenith_gn* current_address;
-    #endif
+    /* the actual content of the file */
+    uint8_t content[CONTENT_SIZE];
+    /* address of the extension address */
+    uint8_t extended_adr_lb;
+    uint8_t extended_adr_hb;
+    uint8_t extended_adr_xlb;
+    /* current node adr */
+    uint8_t adr_lb;
+    uint8_t adr_hb;
+    uint8_t adr_xlb;
 
 }zenith_general_node;
 
@@ -109,29 +96,12 @@ typedef struct{
     /* allocated node variable */
     uint8_t free_page;
     bool allocated_page[NODE_COUNT];
-    #ifndef VIRTUAL_DRIVE
-
     /* address for each node */
     uint8_t page_address[NODE_COUNT*3];
-
     /* first_node_address */
-
     uint8_t first_node_lb;
     uint8_t first_node_hb;
     uint8_t first_node_xlb;
-
-    #endif
-
-    #ifdef VIRTUAL_DRIVE
-
-    /* address for each node */
-    zenith_general_node* page_address[NODE_COUNT];
-
-    /* first_node_address */
-
-    zenith_general_node* first_node;
-
-    #endif
 
 }zenith_fstab;
 
@@ -153,31 +123,18 @@ typedef struct{
 
 #ifdef VIRTUAL_DRIVE
 
-
-    static uint8_t* virtual_drive = NULL;
-
-    /* static address variable in ram */
-
-    static void* cache_adr = NULL;
-
-
-    zenith_fstab fstab_global;
+static uint8_t* virtual_drive = NULL;
 
 #endif
 
 
-#ifndef VIRTUAL_DRIVE
-
 /* static address variable in ram, use only as a return endpoint, so when a function, like malloc and free, need to return an entire address */
-
 static uint8_t cache_adr_lb;
 static uint8_t cache_adr_hb;
 static uint8_t cache_adr_xlb;
 
-#endif
 
 /* zenith_general_node variable in RAM, use as a return endpoint */
-
 
 static zenith_general_node* cache_node = NULL;
 static zenith_general_node* cache_node_2 = NULL;
@@ -185,8 +142,6 @@ static zenith_general_node* cache_node_2 = NULL;
 /* static copy of the first node in RAM, use for navigation */
 
 static zenith_general_node* zenith_root_node = NULL;
-
-
 
 /* driver types */
 
@@ -268,17 +223,9 @@ extern void zenith_set_target(uint8_t target);
 
 /* search in the node tree and find out if somethings called "name" is present */
 
-#ifndef VIRTUAL_DRIVE
 
 extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char* name);
 
-#endif
-
-#ifdef VIRTUAL_DRIVE
-
-extern bool zenith_is_present(zenith_general_node*address, char* name);
-
-#endif
 
 /* get root node, aka the first node of the disk, and save it in a copy in RAM ( it will be used to navigate the root tree ) */
 
