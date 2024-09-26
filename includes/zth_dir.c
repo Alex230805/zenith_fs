@@ -258,6 +258,101 @@ int __zenith_rmdir(uint8_t lb, uint8_t hb, uint8_t xlb, char*name){
 /* zenith function to move a directory from a destination to another, you can change the name in the process */
 
 void zenith_mv(char*start_path, char*name, char*dest_path, char*dest_name){
+  uint8_t index = 0x00;
+  bool end = false;
+
+  uint8_t adr_lb,adr_hb, adr_xlb;
+
+  if(start_path == NULL || name == NULL || dest_path == NULL || dest_name == NULL){
+    printf("Error: source or destination path are NULL");
+    return;
+  }
+
+  zenith_navigate(start_path);
+  if(cache_adr_lb == 0x00 && cache_adr_hb == 0x00 && cache_adr_xlb == 0x00){
+      printf("Error: null pointer detected in the folder extension address");
+      return;
+  }
+  cache_adr_lb_2 = cache_adr_lb;
+  cache_adr_hb_2 = cache_adr_hb;
+  cache_adr_xlb_2 = cache_adr_xlb;
+  
+  zenith_navigate(dest_path);
+  if(cache_adr_lb == 0x00 && cache_adr_hb == 0x00 && cache_adr_xlb == 0x00){
+      printf("Error: null pointer detected in the folder extension address");
+      return;
+  } 
+
+  if(zenith_is_present(cache_adr_lb_2, cache_adr_hb_2, cache_adr_xlb_2, name) == 0){
+    printf("No such file in the directory");
+    return;
+  }
+
+  if(zenith_is_present(cache_adr_lb, cache_adr_hb, cache_adr_xlb, dest_name)){
+    printf("Aborting: there is something with the same name in the destination folder");
+    return;
+  }
+
+  zenith_pop(cache_adr_lb_2, cache_adr_hb_2, cache_adr_xlb_2, zenith_selected_driver);
+  memcpy(cache_node_2, cache_node, ZENITH_NODE_SIZE);
+
+  while(!end && index < CONTENT_SIZE){
+    adr_lb = cache_node_2->content[index];
+    adr_hb = cache_node_2->content[index+1];
+    adr_xlb = cache_node_2->content[index+2];
+
+    zenith_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
+    if(strcmp(cache_node->name, name) == 0 && cache_node->type == DIR_TYPE){
+
+      cache_node_2->content[index] = 0x00;
+      cache_node_2->content[index+1] = 0x00;
+      cache_node_2->content[index+2] = 0x00;
+
+      end = true;
+    }else{
+      index += 3;
+    }
+  }
+
+  if(index == CONTENT_SIZE){
+    printf("Note: extended feature not implemented yet");
+    return;
+  }
+  
+  end = false;
+  index = 0x00;
+  
+  zenith_pop(cache_adr_lb, cache_adr_hb, cache_adr_xlb, zenith_selected_driver);
+  memcpy(cache_node_2, cache_node, ZENITH_NODE_SIZE);
+
+  cache_adr_lb_2 = adr_lb;
+  cache_adr_hb_2 = adr_hb;
+  cache_adr_xlb_2 = adr_xlb;
+
+  while(!end && index < CONTENT_SIZE){
+    adr_lb = cache_node_2->content[index];
+    adr_hb = cache_node_2->content[index+1];
+    adr_xlb = cache_node_2->content[index+2];
+
+    zenith_pop(adr_lb,adr_hb,adr_xlb, zenith_selected_driver);
+    
+    if(adr_lb == 0x00 && adr_hb == 0x00 && adr_xlb == 0x00){
+      cache_node->content[index] = cache_adr_lb_2;
+      cache_node->content[index+1] = cache_adr_hb_2;
+      cache_node->content[index+2] = cache_adr_xlb_2;
+
+      end = true;
+    }else{
+      index +=3;
+    }
+  }
+
+  if(index == CONTENT_SIZE){
+    printf("Note: extended feature not implemented yet");
+    return;
+  }
+  
+  zenith_push(zenith_selected_driver);
 
   return;
 }

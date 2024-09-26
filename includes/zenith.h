@@ -133,6 +133,9 @@ static uint8_t cache_adr_lb;
 static uint8_t cache_adr_hb;
 static uint8_t cache_adr_xlb;
 
+static uint8_t cache_adr_lb_2;
+static uint8_t cache_adr_hb_2;
+static uint8_t cache_adr_xlb_2;
 
 /* zenith_general_node variable in RAM, use as a return endpoint */
 

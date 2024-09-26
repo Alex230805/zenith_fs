@@ -12,9 +12,15 @@ extern void _initialize(){
   
   cache_node = (zenith_general_node*)malloc(ZENITH_NODE_SIZE);
   cache_node_2 = (zenith_general_node*)malloc(ZENITH_NODE_SIZE);
-
   zenith_root_node = (zenith_general_node*)malloc(ZENITH_NODE_SIZE);
 
-  zenith_get_root();
+  cache_adr_lb = 0x00;
+  cache_adr_hb = 0x00;
+  cache_adr_xlb = 0x00;
 
+  cache_adr_lb_2 = 0x00;
+  cache_adr_hb_2 = 0x00;
+  cache_adr_xlb_2 = 0x00;
+
+  //zenith_get_root();
 }
