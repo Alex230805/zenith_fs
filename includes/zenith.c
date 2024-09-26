@@ -240,9 +240,6 @@ extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, c
         if(strcmp(cache_node->name, name) == 0){
           end = true;
           state = true;
-          cache_adr_lb = cache_node->adr_lb;
-          cache_adr_hb = cache_node->adr_hb;
-          cache_adr_xlb = cache_node->adr_xlb;
         }
       }
       index+=3;
