@@ -141,7 +141,12 @@ typedef struct{
 }
 
 
-#define __FEATURE_INTERRUPT() printf("Feature currently under development");
+#define __FEATURE_INTERRUPT() printf("Feature currently under development n");\
+  return;
+
+#define __FEATURE_INTERRUPT_RET(ret_message) printf("Feature currently under development\n");\
+  return ret_message;
+  
 
 typedef enum{
   MEMORY_ERROR = 1,
@@ -150,7 +155,8 @@ typedef enum{
   ROUTE_NOT_FOUND_ERROR,
   NO_NAME_PROVIDED_ERROR,
   NO_ADDRESS_FOUND,
-  STACK_PROTECTION_ERROR
+  STACK_PROTECTION_ERROR,
+  NOT_IMPLEMENTED_YET,
 }zentih_status;
 
 typedef enum{

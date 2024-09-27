@@ -6,8 +6,8 @@
 
 int main(){
     _initialize();
-
+    printf("Hello World\n");
     /* some code here */
-
+  
     return 0;
 }

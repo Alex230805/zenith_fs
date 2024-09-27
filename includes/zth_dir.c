@@ -265,7 +265,7 @@ int zenith_mv(char*start_path, char*name, char*dest_path, char*dest_name){
   }
 
   if(index == CONTENT_SIZE){
-    __FEATURE_INTERRUPT();
+    __FEATURE_INTERRUPT_RET(NOT_IMPLEMENTED_YET);
   }
   
   end = false;
@@ -297,7 +297,7 @@ int zenith_mv(char*start_path, char*name, char*dest_path, char*dest_name){
   }
 
   if(index == CONTENT_SIZE){
-    __FEATURE_INTERRUPT();
+    __FEATURE_INTERRUPT_RET(NOT_IMPLEMENTED_YET);
   }
   
   zenith_push(zenith_selected_driver);
