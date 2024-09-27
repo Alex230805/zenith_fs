@@ -60,6 +60,8 @@
 #define FILE_TYPE ( TYPES_MASK | 0x0d )
 #define DIR_TYPE ( TYPES_MASK | 0x0e)
 
+#define STACK_PROTECTION_LIMIT 64
+
 /* ================================================= */
 
 /* node and fs tab structure */
@@ -112,12 +114,58 @@ typedef struct{
 #define ZENITH_NODE_SIZE (sizeof(zenith_general_node))
 #define ZENITH_FSTAB_SIZE (sizeof(zenith_fstab))
 
-
-
 #define LOCAL_SAVING_PATH "/out/fstab.bin"
 #define DATA_FROM_FLAG_OFFSET ((sizeof(bool) & NODE_COUNT) | (CHAR_SIZE & NAME_LENGTH) | (UINT8_T_SIZE*2))
 #define DATA_FROM_ROOT_OFFSET (DATA_FROM_FLAG_OFFSET | (UINT8_T_SIZE & (NODE_COUNT*3)))
 
+
+
+#define __STACK_PROTECTION_SYSTEM() if(stack_id > STACK_PROTECTION_LIMIT){\
+    printf("Fatal: stack protection system enabled, hard return from recursive routine\n");\
+    return STACK_PROTECTION_ERROR;\
+  }
+
+#define __NAME_CHECK(path, name) if(path == NULL && name == NULL){\
+    printf("Error: no such name provided\n");\
+    return NO_NAME_PROVIDED_ERROR;\
+}
+
+#define __ADDRESS_CHECK(adr_lb, adr_hb,adr_xlb) if(adr_lb == 0x00 && adr_hb == 0x00 && adr_xlb == 0x00){\
+    printf("Error: failed to reach the destination provided\n");\
+    return ROUTE_NOT_FOUND_ERROR;\
+}
+
+#define __EXTENSION_ADDRESS_CHECK(adr_lb,adr_hb,adr_xlb) if(adr_lb == 0x00 && adr_hb == 0x00 && adr_xlb == 0x00){\
+  printf("Fatal: null pointer detected in extension folder address space\n");\
+  return NO_ADDRESS_FOUND;\
+}
+
+
+#define __FEATURE_INTERRUPT() printf("Feature currently under development");
+
+typedef enum{
+  MEMORY_ERROR = 1,
+  WRITING_ERROR,
+  READING_ERROR,
+  ROUTE_NOT_FOUND_ERROR,
+  NO_NAME_PROVIDED_ERROR,
+  NO_ADDRESS_FOUND,
+  STACK_PROTECTION_ERROR
+}zentih_status;
+
+typedef enum{
+  DEFAULT_DRIVER = 0x00,
+  DRIVER_1,
+  DRIVER_2,
+  DRIVER_3,
+  DRIVER_4,
+  DRIVER_5,
+  DRIVER_6,
+  DRIVER_7,
+  DRIVER_8,
+  DRIVER_9,
+  DRIVER_10,
+}zenith_drive;
 
 /* static variable and end-point */
 
@@ -147,19 +195,6 @@ static zenith_general_node* cache_node_2 = NULL;
 static zenith_general_node* zenith_root_node = NULL;
 
 /* driver types */
-
-#define DEFAULT_DRIVER 0x00 /* parallel support */
-
-#define DRIVER_1 0x01 /* custom support */
-#define DRIVER_2 0x02 /* custom support */
-#define DRIVER_3 0x03 /* custom support */
-#define DRIVER_4 0x04 /* custom support */
-#define DRIVER_5 0x05 /* custom support */
-#define DRIVER_6 0x06 /* custom support */
-#define DRIVER_7 0x07 /* custom support */
-#define DRIVER_8 0x08 /* custom support */  
-#define DRIVER_9 0x09 /* custom support */
-#define DRIVER_10 0x0A /* custom support */
 
 
 /* selected driver variable is used to change in all the zenith function the way to do call in the interface layer */
@@ -221,14 +256,9 @@ extern void zenith_free();
 extern void zenith_set_target(uint8_t target);
 
 
-
-/* TODO: define those functions */
-
 /* search in the node tree and find out if somethings called "name" is present */
 
-
 extern bool zenith_is_present(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char* name);
-
 
 /* get root node, aka the first node of the disk, and save it in a copy in RAM ( it will be used to navigate the root tree ) */
 

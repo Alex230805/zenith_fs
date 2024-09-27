@@ -8,54 +8,31 @@
 
 
 int zenith_mkdir(char*path, char*name){
+  uint8_t stack_id = 0x00;
 
-  /* node: zenith_malloc is only called out after the essential checks like the name or 
-   * the destination folder ( if exist ) to just avoid poissible allocation with no 
-   * usage, pratically occupying space for nothing
-   * */
   int state = 0;   
 
-  /* check if the path or the name are a null pointer */
-  if(path == NULL || name == NULL){
-    /* return error */
-    printf("Error: no such name or path provided");
-    state = 2;
-    return state;
-  }
-  /* go to the destination folder */
-  zenith_navigate(path);
-  if(cache_adr_lb != 0x00 && cache_adr_hb != 0x00 && cache_adr_xlb != 0x00 ){
-    /* if cache_adr is null that mean zenith_navigare has failed to go inside the indicated path,so return an error and exit from mkdir */
+  __NAME_CHECK(path,name);
 
-    printf("Error: failed to reach the destination provided");
-    state = 2;
-    return state;
-  }
+  zenith_navigate(path);
+  
+  __ADDRESS_CHECK(cache_adr_lb, cache_adr_hb, cache_adr_xlb);
  
   if(zenith_is_present(cache_adr_lb, cache_adr_hb, cache_adr_xlb, name)){
-    printf("Error: found something with the same name");
-    return state;
+    printf("Aborting: there is something with the same name in the destination folder");
+    return WRITING_ERROR;
   }
 
-  state = __zenith_mkdir(cache_adr_lb, cache_adr_hb,cache_adr_xlb, name);
-
-  switch(state){
-    case 0:
-        printf("Unable to create folder");
-        break;
-    case 1:
-        break;
-    case 2:
-        printf("Error: aborting operation");
-        break;
-  }
-  
+  state = __zenith_mkdir(cache_adr_lb, cache_adr_hb,cache_adr_xlb, name, stack_id);
 
   return state;
 }
 
 
-int __zenith_mkdir(uint8_t lb,uint8_t hb,uint8_t xlb, char*name){
+int __zenith_mkdir(uint8_t lb,uint8_t hb,uint8_t xlb, char*name, uint8_t stack_id){
+  
+  __STACK_PROTECTION_SYSTEM();
+
   bool end = false;
   int state = 0;
   uint8_t adr_lb = 0x00;
@@ -96,7 +73,8 @@ int __zenith_mkdir(uint8_t lb,uint8_t hb,uint8_t xlb, char*name){
         cache_adr_lb = cache_node_2->extended_adr_lb;
         cache_adr_hb = cache_node_2->extended_adr_hb;
         cache_adr_xlb = cache_node_2->extended_adr_xlb;
-        state = __zenith_mkdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, name);
+        stack_id += 1;
+        state = __zenith_mkdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, name, stack_id);
       }else{
         /* if there is an error with the address then flag it with an error code */
         state = 2;
@@ -119,7 +97,8 @@ int __zenith_mkdir(uint8_t lb,uint8_t hb,uint8_t xlb, char*name){
       memcpy(cache_node, cache_node_2, ZENITH_NODE_SIZE);
       zenith_push(zenith_selected_driver);
       /* continue to search insside the allocated folder */
-      state = __zenith_mkdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, name);
+      stack_id+=1;
+      state = __zenith_mkdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, name, stack_id);
     }
 
   }else{
@@ -138,43 +117,23 @@ int __zenith_mkdir(uint8_t lb,uint8_t hb,uint8_t xlb, char*name){
 /* zenith function to remove a directory and return a boolean state abount whats happened */
 
 int zenith_rmdir(char*path, char*name){
-
+  uint8_t stack_id = 0x00;
   int state = 0;
 
-   /* check if the path or the name are a null pointer */
-  if(path == NULL || name == NULL){
-    /* return error */
-    printf("Error: no such name or path provided");
-    return state;
-  }
-  /* go to the destination folder */
+  __NAME_CHECK(path,name);
   zenith_navigate(path);
-  if(cache_adr_lb != 0x00 && cache_adr_hb != 0x00 && cache_adr_xlb != 0x00 ){
-    /* if cache_adr is null that mean zenith_navigare has failed to go inside the indicated path,so return an error and exit from mkdir */
+  __ADDRESS_CHECK(cache_adr_lb, cache_adr_hb, cache_adr_xlb);
 
-    printf("Error: failed to reach the destination provided");
-    return state;
-  } 
-
-  state =__zenith_rmdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, name);
+  state =__zenith_rmdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, name, stack_id);
   
-  switch(state){
-    case 0:
-        printf("No such member named this way");
-        break;
-    case 1:
-        break;
-    case 2:
-        printf("Error: somehting went wrong");
-        break;
-  }
-  
-
   return state;
 }
 
 
-int __zenith_rmdir(uint8_t lb, uint8_t hb, uint8_t xlb, char*name){
+int __zenith_rmdir(uint8_t lb, uint8_t hb, uint8_t xlb, char*name, uint8_t stack_id){
+  
+  __STACK_PROTECTION_SYSTEM();
+
   bool end = false;
   int state = 0;
 
@@ -232,11 +191,8 @@ int __zenith_rmdir(uint8_t lb, uint8_t hb, uint8_t xlb, char*name){
       return state;
     }
     /* then check if those pointers are not NULL */
-    if(cache_node_2->extended_adr_lb == 0x00 && cache_node_2->extended_adr_hb == 0x00 && cache_node_2->extended_adr_xlb == 0x00){
-      printf("Error: null pointer detected in the folder extension address");
-      state = 2;
-      return state;
-    }
+    
+    __EXTENSION_ADDRESS_CHECK(cache_node_2->extended_adr_lb,cache_node_2->extended_adr_hb,cache_node_2->extended_adr_xlb);
     /* then copy it into the cached address */
 
     cache_adr_lb = cache_node_2->extended_adr_lb; 
@@ -244,8 +200,8 @@ int __zenith_rmdir(uint8_t lb, uint8_t hb, uint8_t xlb, char*name){
     cache_adr_xlb = cache_node_2->extended_adr_xlb;
 
     /* and recall the remove dir sub-function  */
-    
-    state = __zenith_rmdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, name); 
+    stack_id+=1;
+    state = __zenith_rmdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, name, stack_id); 
     
   }
 
@@ -257,40 +213,34 @@ int __zenith_rmdir(uint8_t lb, uint8_t hb, uint8_t xlb, char*name){
 
 /* zenith function to move a directory from a destination to another, you can change the name in the process */
 
-void zenith_mv(char*start_path, char*name, char*dest_path, char*dest_name){
+int zenith_mv(char*start_path, char*name, char*dest_path, char*dest_name){
   uint8_t index = 0x00;
   bool end = false;
 
   uint8_t adr_lb,adr_hb, adr_xlb;
-
-  if(start_path == NULL || name == NULL || dest_path == NULL || dest_name == NULL){
-    printf("Error: source or destination path are NULL");
-    return;
-  }
-
+ 
+  __NAME_CHECK(start_path, name);
+  __NAME_CHECK(dest_path, dest_name);
   zenith_navigate(start_path);
-  if(cache_adr_lb == 0x00 && cache_adr_hb == 0x00 && cache_adr_xlb == 0x00){
-      printf("Error: null pointer detected in the folder extension address");
-      return;
-  }
+ 
+  __EXTENSION_ADDRESS_CHECK(cache_adr_lb, cache_adr_hb, cache_adr_xlb);
+
   cache_adr_lb_2 = cache_adr_lb;
   cache_adr_hb_2 = cache_adr_hb;
   cache_adr_xlb_2 = cache_adr_xlb;
   
   zenith_navigate(dest_path);
-  if(cache_adr_lb == 0x00 && cache_adr_hb == 0x00 && cache_adr_xlb == 0x00){
-      printf("Error: null pointer detected in the folder extension address");
-      return;
-  } 
+
+  __EXTENSION_ADDRESS_CHECK(cache_adr_lb, cache_adr_hb, cache_adr_xlb);
 
   if(zenith_is_present(cache_adr_lb_2, cache_adr_hb_2, cache_adr_xlb_2, name) == 0){
     printf("No such file in the directory");
-    return;
+    return READING_ERROR;
   }
 
   if(zenith_is_present(cache_adr_lb, cache_adr_hb, cache_adr_xlb, dest_name)){
     printf("Aborting: there is something with the same name in the destination folder");
-    return;
+    return WRITING_ERROR;
   }
 
   zenith_pop(cache_adr_lb_2, cache_adr_hb_2, cache_adr_xlb_2, zenith_selected_driver);
@@ -315,8 +265,7 @@ void zenith_mv(char*start_path, char*name, char*dest_path, char*dest_name){
   }
 
   if(index == CONTENT_SIZE){
-    printf("Note: extended feature not implemented yet");
-    return;
+    __FEATURE_INTERRUPT();
   }
   
   end = false;
@@ -348,13 +297,12 @@ void zenith_mv(char*start_path, char*name, char*dest_path, char*dest_name){
   }
 
   if(index == CONTENT_SIZE){
-    printf("Note: extended feature not implemented yet");
-    return;
+    __FEATURE_INTERRUPT();
   }
   
   zenith_push(zenith_selected_driver);
 
-  return;
+  return 0;
 }
 
 
