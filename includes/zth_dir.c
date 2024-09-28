@@ -266,10 +266,9 @@ int __zenith_move_pick(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char*nam
 
     zenith_pop(lb,hb,xlb, zenith_selected_driver);
     if(strcmp(cache_node->name, name) == 0 && cache_node->type == DIR_TYPE){
-      
-      cache_adr_lb_2  = cache_node->content[index] = 0x00;
-      cache_adr_hb_2  = cache_node->content[index+1] = 0x00;
-      cache_adr_xlb_2 = cache_node->content[index+2] = 0x00;
+      cache_adr_lb_2  = cache_node->content[index];
+      cache_adr_hb_2  = cache_node->content[index+1];
+      cache_adr_xlb_2 = cache_node->content[index+2];
 
       cache_node_2->content[index] = 0x00;
       cache_node_2->content[index+1] = 0x00;
@@ -308,6 +307,7 @@ int __zenith_move_put(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char*name
   bool end = false;
   uint8_t lb, hb, xlb;
   uint8_t index = 0x00;
+  uint8_t lstate = 0x00;
 
   zenith_pop(adr_lb, adr_hb, adr_xlb, zenith_selected_driver);
   memcpy(cache_node_2, cache_node, ZENITH_NODE_SIZE);
@@ -321,6 +321,9 @@ int __zenith_move_put(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char*name
       cache_node->content[index] = cache_adr_lb_2;
       cache_node->content[index+1] = cache_adr_hb_2;
       cache_node->content[index+2] = cache_adr_xlb_2;
+      zenith_pop(cache_adr_lb_2, cache_adr_hb, cache_adr_xlb, zenith_selected_driver);
+      strcpy(cache_node->name, name);
+      zenith_push(zenith_selected_driver);
       state = 0;
       end = true;
     }else{
@@ -342,7 +345,7 @@ int __zenith_move_put(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char*name
       cache_adr_hb = cache_node_2->adr_hb;
       cache_adr_xlb = cache_node_2->adr_xlb;
       
-      uint8_t lstate = __zenith_mkdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, cache_node_2->name, 0);
+      lstate = __zenith_mkdir(cache_adr_lb, cache_adr_hb, cache_adr_xlb, cache_node_2->name, 0);
       if(lstate != 0){
         __FATAL_ERROR();
       }
