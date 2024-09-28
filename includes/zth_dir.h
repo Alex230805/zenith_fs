@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <ctype.h>
-
+  
 #include "./zenith.h"
 #include "./zth_dev_in.h"
 
@@ -27,6 +27,11 @@ int __zenith_rmdir(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char*name, u
 /* zenith function to move a directory from a destination to another, you can change the name in the process */
 
 int zenith_mv(char*start_path, char*name, char*dest_path, char*dest_name);
+
+int __zenith_move_pick(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char*name, uint8_t stack_id);
+
+int __zenith_move_put(uint8_t adr_lb, uint8_t adr_hb, uint8_t adr_xlb, char*name, uint8_t stack_id);
+
 
 #ifndef ZTH_DIR_IMPLEMENTATION
 #define ZTH_DIR_IMPLEMENTATION

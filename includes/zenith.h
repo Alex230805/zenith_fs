@@ -140,13 +140,16 @@ typedef struct{
   return NO_ADDRESS_FOUND;\
 }
 
+#define __FATAL_ERROR() printf("Fatal: something went wrong during the operation, please retry \n");\
+  return WRITING_ERROR;
 
 #define __FEATURE_INTERRUPT() printf("Feature currently under development n");\
   return;
 
 #define __FEATURE_INTERRUPT_RET(ret_message) printf("Feature currently under development\n");\
   return ret_message;
-  
+
+
 
 typedef enum{
   MEMORY_ERROR = 1,
@@ -157,6 +160,8 @@ typedef enum{
   NO_ADDRESS_FOUND,
   STACK_PROTECTION_ERROR,
   NOT_IMPLEMENTED_YET,
+  FILE_NOT_FOUND,
+  ABORTING_OPERATION
 }zentih_status;
 
 typedef enum{
