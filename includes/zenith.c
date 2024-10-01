@@ -10,7 +10,9 @@
 extern void zenith_initFs(int size, char* part_name){
 
   // TODO: check this functions
-  
+ 
+
+
   FILE* fstab_saved = fopen(LOCAL_SAVING_PATH, "w+");
 
   zenith_fstab fstab;
@@ -22,20 +24,25 @@ extern void zenith_initFs(int size, char* part_name){
     fstab.allocated_page[i] = false;
   }
 
-
-
   uint32_t mem_adr = 0x00000000;
 
-  for(int i=ZENITH_FSTAB_SIZE;i<NODE_COUNT;i++){
+  for(int i=0;i<NODE_COUNT;i++){
     fstab.page_address[i] = (uint8_t)mem_adr;
     fstab.page_address[i+1] = (uint8_t)mem_adr>>8;
     fstab.page_address[i+2] = (uint8_t)mem_adr>>16;
-    mem_adr+=NODE_COUNT;
+    mem_adr += ZENITH_NODE_SIZE;
   }
 
-  fstab.first_node_lb = fstab.page_address[0];
-  fstab.first_node_hb = fstab.page_address[1];
-  fstab.first_node_xlb = fstab.page_address[2];
+  int index = 0;
+
+  for(int i=0; i<ZENITH_FSTAB_SIZE/255; i++){
+    fstab.allocated_page[i] = true;
+    index += 1;
+  }
+  
+  fstab.first_node_lb = fstab.page_address[index+1];
+  fstab.first_node_hb = fstab.page_address[index+2];
+  fstab.first_node_xlb = fstab.page_address[index+3];
 
 
   /* write dow a binary file with the fstab */
@@ -47,20 +54,24 @@ extern void zenith_initFs(int size, char* part_name){
 }
 
 extern int zenith_loadFs(int size){
-  #ifdef virtual_drive
-  if(virtual_drive == NULL) __FATAL_ERROR();
+  #ifdef VIRTUAL_DRIVE
+  if(virtual_drive == NULL) {
+    virtual_drive = (uint8_t*)malloc(UINT8_T_SIZE*(SIZE/255));
+  }
+
   FILE *fp;
 
   fp = fopen(LOCAL_SAVING_PATH, "r");
-  memcpy(virtual_drive, fp, ZENITH_FSTAB_SIZE);
-
+  memcpy(&virtual_drive[0], fp, ZENITH_FSTAB_SIZE);
   fclose(fp);
+
   return 0;
   #endif
 
   #ifndef VIRTUAL_DRIVE
    return ABORTING_OPERATION;
   #endif
+  return 0;
 }
 
 
@@ -79,7 +90,7 @@ extern void zenith_malloc(int type, char*name){
   node.perm = R_PERM | W_PERM;
   node.extended = false;
   
-  switch(type){
+switch(type){
     case FILE_TYPE:
         node.perm = node.perm | PERM_MASK_FILE;
         break;

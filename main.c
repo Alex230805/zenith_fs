@@ -5,10 +5,10 @@
 
 
 int main(){
-    _initialize();
+    Zth.init();
     Zth.zenith_initFs(SIZE, "test"); 
-    printf("Hello World\n");
+    Zth.zenith_loadFs(SIZE);
+ 
     /* some code here */
-  
     return 0;
 }

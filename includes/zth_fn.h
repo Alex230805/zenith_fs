@@ -26,6 +26,7 @@ extern void _initialize();
 
 #ifdef VIRTUAL_DRIVE
 
+typedef void (*_initialize_fn)(void);
 typedef void (*zenith_initFs_ptr)(int size, char*path); 
 typedef int (*zenith_loadFs_ptr)(int size); 
 
@@ -39,6 +40,7 @@ typedef int (*zenith_rmdir_ptr)(char*path, char*name);
 
 
 typedef struct {
+  _initialize_fn init;
   int version;
   int size;
   #ifdef VIRTUAL_DRIVE
@@ -52,6 +54,7 @@ typedef struct {
 }zth_int;
 
 static zth_int Zth = {
+  .init = _initialize,
   .version = VERSION,
   .size = SIZE,
   #ifdef VIRTUAL_DRIVE
