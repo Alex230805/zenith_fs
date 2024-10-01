@@ -6,6 +6,7 @@
 
 int main(){
     _initialize();
+    Zth.zenith_initFs(SIZE, "test"); 
     printf("Hello World\n");
     /* some code here */
   

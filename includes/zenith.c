@@ -7,10 +7,11 @@
 #ifndef ZENITH_EXCLUDE_INIT
 
 
-extern void zenith_initFs(int size, char* part_name, uint8_t drive_type){
+extern void zenith_initFs(int size, char* part_name){
 
+  // TODO: check this functions
+  
   FILE* fstab_saved = fopen(LOCAL_SAVING_PATH, "w+");
-
 
   zenith_fstab fstab;
   strcpy(fstab.name, part_name);
@@ -44,6 +45,24 @@ extern void zenith_initFs(int size, char* part_name, uint8_t drive_type){
 
   return;
 }
+
+extern int zenith_loadFs(int size){
+  #ifdef virtual_drive
+  if(virtual_drive == NULL) __FATAL_ERROR();
+  FILE *fp;
+
+  fp = fopen(LOCAL_SAVING_PATH, "r");
+  memcpy(virtual_drive, fp, ZENITH_FSTAB_SIZE);
+
+  fclose(fp);
+  return 0;
+  #endif
+
+  #ifndef VIRTUAL_DRIVE
+   return ABORTING_OPERATION;
+  #endif
+}
+
 
 #endif
 
@@ -107,7 +126,7 @@ break;
     }else{
       full_address+=1;
       count+=1;
-    }
+}
   }
 
   full_address = (uint8_t)DATA_FROM_FLAG_OFFSET + (count*3);

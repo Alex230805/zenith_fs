@@ -12,7 +12,7 @@
  
 /* types of support and drive */
 
-//#define VIRTUAL_DRIVE
+#define VIRTUAL_DRIVE
 
 //#define DIRECT_DRIVE_SUPPORT
 
@@ -24,17 +24,17 @@
 
 /* fs tab precompiler costant */
 
-#define SIZE 16777216
+#define SIZE 16777215
 
 /* size precompiler costant that shoud be defined to specify the partition size */
 
 #ifndef SIZE
 
-#define SIZE 65536 /* default partition size ( 64kb ) */
+#define SIZE 65535 /* default partition size ( 64kb ) */
 
 #endif
 
-#define MAX_FILESYSTEM_SIZE 16777216 /* max size adressable by the filesystem ( in byte ) */
+#define MAX_FILESYSTEM_SIZE 16777215 /* max size adressable by the filesystem ( in byte ) */
 
 
 #define NAME_LENGTH 8
@@ -114,7 +114,10 @@ typedef struct{
 #define ZENITH_NODE_SIZE (sizeof(zenith_general_node))
 #define ZENITH_FSTAB_SIZE (sizeof(zenith_fstab))
 
+#define ZENITH_FSTAB_NODE_SPACE (UINT8_T_SIZE*4 + CHAR_SIZE*NAME_LENGHT)
+
 #define LOCAL_SAVING_PATH "/out/fstab.bin"
+
 #define DATA_FROM_FLAG_OFFSET ((sizeof(bool) & NODE_COUNT) | (CHAR_SIZE & NAME_LENGTH) | (UINT8_T_SIZE*2))
 #define DATA_FROM_ROOT_OFFSET (DATA_FROM_FLAG_OFFSET | (UINT8_T_SIZE & (NODE_COUNT*3)))
 
@@ -222,8 +225,10 @@ static uint8_t zenith_selected_driver = DEFAULT_DRIVER;
 #ifndef ZENITH_EXCLUDE_INIT
 
 
-extern void zenith_initFs(int size, char* part_name, uint8_t drive_type);
+extern void zenith_initFs(int size, char* part_name);
 
+
+extern int zenith_loadFs(int size);
 
 #endif
 /*

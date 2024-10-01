@@ -12,11 +12,6 @@ extern void zenith_push(uint8_t support_types){
     uint8_t adr_hb = cache_node->adr_hb;
     uint8_t adr_xlb = cache_node->adr_xlb;
 
-    #endif
-    uint32_t mem = 0xeaeaea;
-
-    
-    #ifndef VIRTUAL_DRIVE
 
     for(uint8_t i=0;i<0xff;i++){
         /* 
@@ -117,6 +112,11 @@ extern void zenith_push(uint8_t support_types){
 
     #endif
 
+    #ifdef VIRTUAL_DRIVE
+      uint32_t offset =  cache_node->adr_lb | cache_node->adr_hb<<8 | cache_node->adr_xlb << 16;
+      memcpy(virtual_drive+offset, cache_node, ZENITH_NODE_SIZE);
+
+    #endif
     return;
 
 }
@@ -138,8 +138,15 @@ extern void zenith_single_push(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb ,ui
     default:
           break;
   }
-
+  
   #endif
+
+  #ifdef VIRTUAL_DRIVE
+    uint32_t offset = adr_lb | adr_hb << 8 | adr_xlb << 16;
+    virtual_drive[offset] = byte;
+  #endif
+
+  return;
 }
 
 
@@ -150,10 +157,7 @@ extern void zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t l_adr_xlb,uint8
     uint8_t adr_lb = l_adr_lb;
     uint8_t adr_hb = l_adr_hb;
     uint8_t adr_xlb = l_adr_xlb;
-    
-    #endif
-
-    #ifndef VIRTUAL_DRIVE
+     
 
     for(uint8_t i=0;i<0xff;i++){
                 /* 
@@ -251,7 +255,11 @@ extern void zenith_pop(uint8_t l_adr_lb,uint8_t l_adr_hb,uint8_t l_adr_xlb,uint8
     }
 
     #endif
+    #ifdef VIRTUAL_DRIVE
+      uint32_t offset =  l_adr_lb | l_adr_hb << 8 | l_adr_xlb << 16;
+      memcpy(cache_node, virtual_drive+offset, ZENITH_NODE_SIZE);
 
+    #endif
     return;
 }
 
@@ -278,6 +286,13 @@ extern uint8_t zenith_single_pop(uint8_t adr_lb,uint8_t adr_hb,uint8_t adr_xlb, 
   }
 
   #endif
+
+  #ifdef VIRTUAL_DRIVE
+    uint32_t offset = adr_lb | adr_hb << 8 | adr_xlb << 16;
+    byte = virtual_drive[offset];  
+#endif
+
+
 
   return byte;
 }
