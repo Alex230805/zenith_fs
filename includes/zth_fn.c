@@ -9,7 +9,7 @@ extern void _initialize(){
   virtual_drive = (uint8_t*)malloc(UINT8_T_SIZE * (SIZE/255) );
 
   #endif 
-  
+  zenith_selected_driver = DEFAULT_DRIVER; 
   cache_node = (zenith_general_node*)malloc(ZENITH_NODE_SIZE);
   cache_node_2 = (zenith_general_node*)malloc(ZENITH_NODE_SIZE);
   zenith_root_node = (zenith_general_node*)malloc(ZENITH_NODE_SIZE);

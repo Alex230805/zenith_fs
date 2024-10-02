@@ -38,7 +38,6 @@ typedef int (*zenith_mkdir_ptr)(char*path, char*name);
 typedef int (*zenith_rmdir_ptr)(char*path, char*name); 
 
 
-
 typedef struct {
   _initialize_fn init;
   int version;

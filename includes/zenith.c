@@ -55,14 +55,14 @@ extern void zenith_initFs(int size, char* part_name){
 
 extern int zenith_loadFs(int size){
   #ifdef VIRTUAL_DRIVE
-  if(virtual_drive == NULL) {
-    virtual_drive = (uint8_t*)malloc(UINT8_T_SIZE*(SIZE/255));
-  }
+  
+  if(virtual_drive == NULL) __FATAL_ERROR();
 
   FILE *fp;
 
   fp = fopen(LOCAL_SAVING_PATH, "r");
-  memcpy(&virtual_drive[0], fp, ZENITH_FSTAB_SIZE);
+  if(fp == NULL) __FATAL_ERROR();
+  fread(virtual_drive, ZENITH_FSTAB_SIZE, 1, fp);
   fclose(fp);
 
   return 0;

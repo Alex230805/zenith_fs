@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <ctype.h>
 #include <string.h>
+#include "./zth_static.h"
 
 
 /*  To write and read somethings from the drive indicating
