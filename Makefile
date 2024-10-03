@@ -1,7 +1,7 @@
-build_main: build_zenith ./main.c 
-	gcc -c main.c -o bin/main.o
-	gcc ./bin/* -o main
 
+build_main: build_zenith ./main.c 
+	gcc -Wall -Wextra -c main.c -o bin/main.o
+	gcc -Wall -Wextra ./bin/* -o main
 
 build_zenith: build_zth_static build_zenith_fn build_zenith_main build_zth_dir build_zth_file build_zth_dev_in
 

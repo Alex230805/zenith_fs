@@ -19,7 +19,8 @@
 
 /* fs tab precompiler costant */
 
-#define SIZE 16777215
+#define SIZE 16777215 /* define 16 megabyte partition */
+
 
 /* size precompiler costant that shoud be defined to specify the partition size */
 

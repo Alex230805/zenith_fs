@@ -118,7 +118,6 @@ zenith_general_node* zenith_root_node;
 
 uint8_t zenith_selected_driver;
 
-
 /*
 
     This is the initialization function, call it if you want to 
@@ -132,7 +131,7 @@ uint8_t zenith_selected_driver;
 extern void zenith_initFs(int size, char* part_name);
 
 
-extern int zenith_loadFs(int size);
+extern int zenith_loadFs();
 
 #endif
 /*

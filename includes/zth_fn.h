@@ -28,7 +28,7 @@ extern void _initialize();
 
 typedef void (*_initialize_fn)(void);
 typedef void (*zenith_initFs_ptr)(int size, char*path); 
-typedef int (*zenith_loadFs_ptr)(int size); 
+typedef int (*zenith_loadFs_ptr)(); 
 
 #endif
 
@@ -42,24 +42,20 @@ typedef struct {
   _initialize_fn init;
   int version;
   int size;
-  #ifdef VIRTUAL_DRIVE
-    zenith_initFs_ptr zenith_initFs;
-    zenith_loadFs_ptr zenith_loadFs;
-  #endif
+  zenith_initFs_ptr zenith_initFs;
+  zenith_loadFs_ptr zenith_loadFs;
   zenith_mkdir_ptr zenith_mkdir;
   zenith_rmdir_ptr zenith_rmdir;
   zenith_mv_ptr zenith_mv;
-  
+
 }zth_int;
 
 static zth_int Zth = {
   .init = _initialize,
   .version = VERSION,
   .size = SIZE,
-  #ifdef VIRTUAL_DRIVE
   .zenith_initFs = &zenith_initFs,
   .zenith_loadFs = &zenith_loadFs,
-  #endif
   .zenith_mkdir = &zenith_mkdir,
   .zenith_rmdir = &zenith_rmdir,
   .zenith_mv = &zenith_mv

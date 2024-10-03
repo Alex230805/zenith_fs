@@ -13,7 +13,7 @@ extern void zenith_initFs(int size, char* part_name){
  
 
 
-  FILE* fstab_saved = fopen(LOCAL_SAVING_PATH, "w+");
+  FILE* fstab_saved = fopen(LOCAL_SAVING_PATH, "wb");
 
   zenith_fstab fstab;
   strcpy(fstab.name, part_name);
@@ -25,12 +25,14 @@ extern void zenith_initFs(int size, char* part_name){
   }
 
   uint32_t mem_adr = 0x00000000;
+  int cursor = 0;
 
   for(int i=0;i<NODE_COUNT;i++){
-    fstab.page_address[i] = (uint8_t)mem_adr;
-    fstab.page_address[i+1] = (uint8_t)mem_adr>>8;
-    fstab.page_address[i+2] = (uint8_t)mem_adr>>16;
+    fstab.page_address[cursor] = (uint8_t)mem_adr;
+    fstab.page_address[cursor+1] = (uint8_t)mem_adr>>8;
+    fstab.page_address[cursor+2] = (uint8_t)mem_adr>>16;
     mem_adr += ZENITH_NODE_SIZE;
+    cursor+=3;
   }
 
   int index = 0;
@@ -47,22 +49,33 @@ extern void zenith_initFs(int size, char* part_name){
 
   /* write dow a binary file with the fstab */
   fseek(fstab_saved, 0x00, SEEK_SET);
-  fwrite(&fstab, ZENITH_FSTAB_SIZE, 1, fstab_saved); 
+  fwrite(&fstab, 1, ZENITH_FSTAB_SIZE, fstab_saved); 
   fclose(fstab_saved);
 
   return;
 }
 
-extern int zenith_loadFs(int size){
+extern int zenith_loadFs(){
   #ifdef VIRTUAL_DRIVE
-  
-  if(virtual_drive == NULL) __FATAL_ERROR();
+ 
+  if(virtual_drive == NULL){
+    printf("Virtual driver not initialized yet");
+    return ABORTING_OPERATION; 
+  };
 
   FILE *fp;
 
-  fp = fopen(LOCAL_SAVING_PATH, "r");
+  fp = fopen(LOCAL_SAVING_PATH, "rb");
   if(fp == NULL) __FATAL_ERROR();
-  fread(virtual_drive, ZENITH_FSTAB_SIZE, 1, fp);
+
+  fseek(fp, 0, SEEK_END);
+  int flen = ftell(fp);
+  fseek(fp, 0, SEEK_SET);
+  
+  int lenght = fread(virtual_drive, 1, flen, fp);
+
+  if(lenght == 0) __FATAL_ERROR();
+
   fclose(fp);
 
   return 0;

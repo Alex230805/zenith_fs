@@ -4,6 +4,7 @@
 
 
 extern void _initialize(){
+
   #ifdef VIRTUAL_DRIVE
 
   virtual_drive = (uint8_t*)malloc(UINT8_T_SIZE * (SIZE/255) );
