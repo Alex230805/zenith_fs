@@ -46,6 +46,13 @@ extern void zenith_initFs(int size, char* part_name){
   fstab.first_node_hb = fstab.page_address[index+2];
   fstab.first_node_xlb = fstab.page_address[index+3];
 
+  if(virtual_drive == NULL){
+    printf("Virtual driver not initialized yet");
+    return; 
+  };
+
+
+  memcpy(virtual_drive, &fstab, ZENITH_FSTAB_SIZE);
 
   /* write dow a binary file with the fstab */
   fseek(fstab_saved, 0x00, SEEK_SET);
