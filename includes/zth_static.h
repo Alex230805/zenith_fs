@@ -76,10 +76,9 @@ typedef struct zenith_gn{
 typedef struct{
     /* name for the partition */
     char name[NAME_LENGTH];
-    /* partition size, max 16mb */
-    uint8_t partition_size; 
-    /* allocated node variable */
-    uint8_t free_page;
+
+    uint8_t free_pages;
+
     bool allocated_page[NODE_COUNT];
     /* address for each node */
     uint8_t page_address[NODE_COUNT*3];
@@ -93,6 +92,7 @@ typedef struct{
 /* ================================================= */
 
 
+/* declaration of static variable */
 
 #ifdef VIRTUAL_DRIVE
 
@@ -124,10 +124,6 @@ extern zenith_general_node* zenith_root_node;
 /* selected driver variable is used to change in all the zenith function the way to do call in the interface layer */
 
 extern uint8_t zenith_selected_driver;
-
-/* define static variable */
-
-
 
 #ifdef STATIC_IMPLEMENTATION
 #define STATIC_IMPLEMENTATION

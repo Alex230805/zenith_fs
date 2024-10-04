@@ -17,8 +17,7 @@ extern void zenith_initFs(int size, char* part_name){
 
   zenith_fstab fstab;
   strcpy(fstab.name, part_name);
-  fstab.partition_size = size;
-  fstab.free_page = size / ZENITH_NODE_SIZE;
+  fstab.free_pages = size / ZENITH_NODE_SIZE;
 
   for(int i=0;i<NODE_COUNT;i++){
     fstab.allocated_page[i] = false;
@@ -26,6 +25,7 @@ extern void zenith_initFs(int size, char* part_name){
 
   uint32_t mem_adr = 0x00000000;
   int cursor = 0;
+  int index = 0;
 
   for(int i=0;i<NODE_COUNT;i++){
     fstab.page_address[cursor] = (uint8_t)mem_adr;
@@ -33,9 +33,11 @@ extern void zenith_initFs(int size, char* part_name){
     fstab.page_address[cursor+2] = (uint8_t)mem_adr>>16;
     mem_adr += ZENITH_NODE_SIZE;
     cursor+=3;
+    index += 1;
   }
+  fstab.free_pages -= index;
 
-  int index = 0;
+  index = 0;
 
   for(int i=0; i<ZENITH_FSTAB_SIZE/255; i++){
     fstab.allocated_page[i] = true;
@@ -129,7 +131,7 @@ break;
 
   /* read directly from device for checking and writing things, ONLY for malloc and free, on other just take reference from the device interface layer ( zenith_push, zenith_pop ) */
 
-  uint8_t adr_lb = CHAR_SIZE + UINT8_T_SIZE * 2; /* starting point */
+  uint8_t adr_lb = CHAR_SIZE + UINT8_T_SIZE; /* starting point */
   uint8_t adr_hb = 0x00;
   uint8_t adr_xlb = 0x00;
   uint32_t full_address = (adr_xlb << 16) | (adr_hb << 8) |( adr_lb );
@@ -187,6 +189,9 @@ break;
   node.adr_lb = cache_adr_lb;
   node.adr_hb = cache_adr_hb;
   node.adr_xlb = cache_adr_xlb;
+ 
+  full_address = (CHAR_SIZE*NAME_LENGTH) + UINT8_T_SIZE;
+  
 
   memcpy(&cache_node[0],&node, ZENITH_NODE_SIZE);
   zenith_push(zenith_selected_driver);
@@ -241,7 +246,7 @@ extern void zenith_free(){
   }
 
   /* calculate the exact address and erase the flag from the address allocation table */
-  full_address = UINT8_T_SIZE*2 + CHAR_SIZE + erase_position;
+  full_address = UINT8_T_SIZE + (CHAR_SIZE*NAME_LENGTH) + erase_position;
   
   adr_lb = (uint8_t)full_address ;
   adr_hb = (uint8_t)full_address>>8;      

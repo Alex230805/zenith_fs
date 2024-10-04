@@ -36,7 +36,8 @@ typedef int (*zenith_mv_ptr)(char* start_path, char*name, char*dest_path, char*d
 
 typedef int (*zenith_mkdir_ptr)(char*path, char*name);
 typedef int (*zenith_rmdir_ptr)(char*path, char*name); 
-
+typedef void (*zenith_malloc_ptr)(int type, char*name);
+typedef void (*zenith_free_ptr)(void);
 
 typedef struct {
   _initialize_fn init;
@@ -44,10 +45,14 @@ typedef struct {
   int size;
   zenith_initFs_ptr zenith_initFs;
   zenith_loadFs_ptr zenith_loadFs;
+  
+  zenith_malloc_ptr zenith_malloc;
+  zenith_free_ptr zenith_free;
+
   zenith_mkdir_ptr zenith_mkdir;
   zenith_rmdir_ptr zenith_rmdir;
   zenith_mv_ptr zenith_mv;
-
+  
 }zth_int;
 
 static zth_int Zth = {
@@ -56,6 +61,8 @@ static zth_int Zth = {
   .size = SIZE,
   .zenith_initFs = &zenith_initFs,
   .zenith_loadFs = &zenith_loadFs,
+  .zenith_malloc = &zenith_malloc,
+  .zenith_free = &zenith_free,
   .zenith_mkdir = &zenith_mkdir,
   .zenith_rmdir = &zenith_rmdir,
   .zenith_mv = &zenith_mv

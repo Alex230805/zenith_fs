@@ -30,12 +30,10 @@
 #define ZENITH_NODE_SIZE (sizeof(zenith_general_node))
 #define ZENITH_FSTAB_SIZE (sizeof(zenith_fstab))
 
-#define ZENITH_FSTAB_NODE_SPACE (UINT8_T_SIZE*4 + CHAR_SIZE*NAME_LENGHT)
-
 #define LOCAL_SAVING_PATH "out/fstab.bin"
 
-#define DATA_FROM_FLAG_OFFSET ((sizeof(bool) & NODE_COUNT) | (CHAR_SIZE & NAME_LENGTH) | (UINT8_T_SIZE*2))
-#define DATA_FROM_ROOT_OFFSET (DATA_FROM_FLAG_OFFSET | (UINT8_T_SIZE & (NODE_COUNT*3)))
+#define DATA_FROM_FLAG_OFFSET ((sizeof(bool) * NODE_COUNT) | (CHAR_SIZE * NAME_LENGTH) | (UINT8_T_SIZE))
+#define DATA_FROM_ROOT_OFFSET (DATA_FROM_FLAG_OFFSET | (UINT8_T_SIZE * (NODE_COUNT*3)))
 
 
 
@@ -97,6 +95,15 @@ typedef enum{
   DRIVER_10,
 }zenith_drive;
 
+/*
+
+    This is the initialization function, call it if you want to 
+    initialize a new partition.
+
+*/
+
+/* define static variable */
+
 #ifdef VIRTUAL_DRIVE
 
 uint8_t* virtual_drive;
@@ -118,12 +125,9 @@ zenith_general_node* zenith_root_node;
 
 uint8_t zenith_selected_driver;
 
-/*
 
-    This is the initialization function, call it if you want to 
-    initialize a new partition.
 
-*/
+
 
 #ifndef ZENITH_EXCLUDE_INIT
 
